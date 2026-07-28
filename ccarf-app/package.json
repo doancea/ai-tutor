@@ -1,0 +1,22 @@
+{
+  "name": "ccarf-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local, single-user study tracker for the CCAR-F exam plan.",
+  "scripts": {
+    "postinstall": "cd client && npm install",
+    "dev": "concurrently -n SERVER,CLIENT -c blue,yellow \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "node server/index.js",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "lowdb": "^1.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
