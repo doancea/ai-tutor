@@ -101,20 +101,23 @@ supplementary context that may inform pacing (e.g. someone with an AWS ML cert m
 time on general AI/agent concepts) without assuming any prior credential predicts fit for a
 specific Claude cert.
 
-## Parking lot — self-assessed test-validity question, for Group D
+## Resolved — self-assessed test-validity question, dropped from Group D
 
-Not a locked decision — flagged here during the Group C discussion so the idea isn't lost
-before Group D (prior diagnostic / pre-test) is actually opened up.
+**Decision:** do not ask a self-sentiment question ("how accurately do you feel this reflects
+where you actually are?") alongside the Group D diagnostic score. Raised as an idea during the
+Group C discussion, parked pending Group D, and dropped once Group D was actually designed.
 
-**Idea raised:** alongside a pre-test/diagnostic, consider also asking something like "how
-accurately do you feel this reflects where you actually are?" — a self-sentiment check
-alongside the objective score.
+**Why:** The idea's own caveat, raised in the same breath it was proposed, turned out to be
+disqualifying: self-assessed confidence in a test result carries the same bias/blind-spot
+problem as the raw score, DECISIONS.md already warns against trusting ("recognition ≠
+recall/application," treat a good score with skepticism) — so a self-rated "I trust this score"
+answer is a second layer of the same blind spot, not an independent check on it. It doesn't give
+the agent a signal it should act on any differently than it already does (weight misses over
+hits regardless of stated confidence), and risks the agent anchoring on stated confidence in
+exactly the way DECISIONS.md warns against.
 
-**Caveat raised in the same breath:** self-assessment carries human bias and blind spots, so
-the answer to that question may not itself be a trustworthy signal — worth weighing, not
-assuming, when Group D is designed. This echoes DECISIONS.md's own instruction to treat a good
-diagnostic score with skepticism rather than at face value, so a self-rated "I trust this score"
-answer probably deserves the same skepticism, not automatic weight.
+**How to apply:** Group D's diagnostic question (Q1) stands alone — score and domain breakdown
+only, no accompanying confidence/sentiment field.
 
 ## Group C, Q1 & Q2 — deadline framing before time budget
 
@@ -152,3 +155,35 @@ For scheduling math, anchor to the **low end** of the chosen Q2 range (or the st
 "Other"), consistent with the reference case's bias toward not rewarding optimistic assumptions
 with a tighter plan. Distribution, if given, informs task shape (bite-sized daily prompts vs.
 longer deep-work blocks) but never blocks generation.
+
+## Group D, Q1 — prior diagnostic, with sourcing pushed to the agent, not the interview
+
+**Decision:** the interview asks only whether the person has *already taken* a diagnostic or
+mock exam relevant to their goal — it does not ask them to determine whether a viable one
+exists if they haven't. That search-and-recommend step is agent-side behavior triggered by a
+"no" answer, not a separate interview question.
+
+- Q1 (**required**): Have you already taken a diagnostic or mock exam relevant to this goal?
+  - **Yes** → capture score and domain/topic breakdown as open text (source sites don't share a
+    common domain taxonomy, so free-form here, consistent with the open-entry default).
+  - **No** → no further interview question; the agent takes over from here.
+- Agent-side behavior off a "No" answer (not posed to the person as a question):
+  1. Check whether a viable existing mock exam/diagnostic exists for their target track.
+  2. If one exists → recommend it as a first step, and treat the generated plan as
+     provisional/pending that result rather than finalized without it.
+  3. If no viable external option exists (track too new, nothing credible found) → only then
+     does the agent construct its own lightweight check.
+
+**Why:** The reference case's real diagnostic was itself "a 28-question mock exam, external
+site" — an existing third-party resource, not something generated in-house. So "the agent builds
+its own pre-test" is the least-precedented fallback, not the default, and the interview
+shouldn't assume otherwise. Asking the interviewee to judge "is there a viable mock exam out
+there" also misplaces the research burden — they're no better positioned to know what credible
+external diagnostics exist for their track than they were to know domain weights are
+triangulated, not officially published (see "Where domain weights and hour estimates came
+from" in DECISIONS.md). That search is squarely the agent's job.
+
+**How to apply:** Q1 blocks nothing by itself, but its answer determines whether the generated
+plan is treated as final or provisional. A "No" answer with a viable external option found
+should produce a plan explicitly marked pending that result, not a plan that quietly proceeds as
+if no diagnostic data will ever exist.
