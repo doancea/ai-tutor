@@ -148,6 +148,42 @@ when the same skepticism applies every time new assessment data shows up.
 score-bearing input across the plan's lifetime, generalizing what Group D's "How to apply"
 already stated for the intake diagnostic specifically.
 
+## Group F, Q1 & Q2 — plan format and learning modality
+
+**Decision:** two bucketed-choice questions covering the shape of the deliverable and the
+balance of hands-on vs. reference-style learning, deliberately scoped to leave task-level
+organization to the agent rather than asking the person to specify it.
+
+- Q1 — Plan format (**required**, bucketed + Other): structured tracker/checklist (phase-by-
+  phase tasks to check off), narrative document (a written guide to read through), or loose/
+  high-level guidance (pointers and direction, self-directed on specifics).
+- Q2 — Learning modality (**optional**, bucketed + Other): hands-on practice/building, reading/
+  reference material, or mixed. Triggers two follow-ups only when a hands-on-leaning answer
+  (hands-on or mixed) is given:
+  - Q2a — Type of hands-on (bucketed + Other): standalone practice projects/exercises, applying
+    directly to real current work, structured guided labs/tutorials, or open-ended
+    tinkering/exploration.
+  - Q2b — Size of hands-on tasks (bucketed + Other): quick (15–30 min), medium (1–2 hrs), or
+    large/project-scale (multi-session).
+
+**Why:** Task granularity (how many tasks, how they're grouped) was deliberately dropped as its
+own question — it's an implementation detail the agent's organizing logic should just handle,
+not a dial worth asking the person to turn directly. Plan format is a different kind of
+question: it determines the actual shape of the deliverable, and the current software has a
+specific bias built in (phases → tasks → quizzes → time log, per `seed.js`) that only matches
+one of the three options. Because there's no safe universal default here — unlike Q2, where
+"mixed" is a reasonable fallback if skipped — Q1 has to be required so the agent doesn't
+silently assume the tracker format fits everyone. Q2's hands-on follow-ups exist because "hands-
+on" alone is as vague as "regular" was in Group B's rejected Likert grid — someone picturing
+quick guided exercises and someone picturing multi-day build projects would both answer
+"hands-on" identically without them, so this is a case where added structure prevents an
+incomplete signal rather than manufacturing false precision.
+
+**How to apply:** Q1 blocks plan generation if empty — the agent needs to know which deliverable
+shape to target before anything else about structure makes sense. Q2 and its follow-ups never
+block; skipping Q2 defaults to a mixed-modality assumption, and Q2a/Q2b only apply when Q2
+itself leans hands-on.
+
 ## Group C, Q1 & Q2 — deadline framing before time budget
 
 **Decision:** ask whether a hard deadline/mandate exists before asking about weekly time
