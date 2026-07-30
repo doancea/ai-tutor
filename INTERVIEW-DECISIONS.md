@@ -119,6 +119,35 @@ exactly the way DECISIONS.md warns against.
 **How to apply:** Group D's diagnostic question (Q1) stands alone — score and domain breakdown
 only, no accompanying confidence/sentiment field.
 
+## Group E — folded into Group D as a standing agent policy, not an interview question
+
+**Decision:** there is no Group E interview question. The originally sketched Group E
+("calibration policy" — MCQ-vs-applied self-awareness) isn't information to gather from the
+interviewee at all; it's a fixed interpretive rule the agent applies to any assessment data it
+sees, regardless of what the person reports. It's now stated as a general policy rather than
+scoped only to the Group D pre-test.
+
+**Policy (generalized from DECISIONS.md's diagnostic-handling instruction):** treat
+multiple-choice/recognition-style success with skepticism (recognition ≠ recall/application);
+weight misses more heavily than hits; err toward keeping content in the plan rather than cutting
+it on a good score. This applies to **any** assessment result the agent encounters over the life
+of the plan — not just the initial Group D diagnostic, but later re-checks, practice quizzes, or
+a second mock exam taken mid-plan.
+
+**Why:** The original Group E concept and the self-sentiment question dropped from Group D are
+the same mistake in two forms — both ask the *person* to self-report on how much their own
+assessment result should be trusted. But "recognition ≠ recall" is a property of multiple-choice
+testing itself, true independent of what anyone believes about their own calibration — asking
+the interviewee about it doesn't change the answer, it just adds a self-report that carries the
+same bias problem the policy exists to guard against. There's no question whose answer would
+change agent behavior, so it isn't interview content — it belongs in the agent's standing rules,
+not the questionnaire, and shouldn't be scoped narrowly to one moment (the intake diagnostic)
+when the same skepticism applies every time new assessment data shows up.
+
+**How to apply:** No new interview field. This policy governs how the agent interprets *any*
+score-bearing input across the plan's lifetime, generalizing what Group D's "How to apply"
+already stated for the intake diagnostic specifically.
+
 ## Group C, Q1 & Q2 — deadline framing before time budget
 
 **Decision:** ask whether a hard deadline/mandate exists before asking about weekly time
