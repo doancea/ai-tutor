@@ -1,6 +1,6 @@
 # TEST-PERSONAS.md
 
-19 synthetic test personas used to stress-test the onboarding interview design
+22 synthetic test personas used to stress-test the onboarding interview design
 (`INTERVIEW-DECISIONS.md`) and, later, the agent's plan-generation behavior — the same role
 `DECISIONS.md`'s one real diagnostic result played for the original single-user build, just
 scaled to cover intersections we don't have a real person for. Each persona is instantiated as
@@ -8,6 +8,13 @@ an actual subagent that will answer the Group A–F interview questions in chara
 session. This doc is the roster and the answer key; the **Ground truth** line under each persona
 is for our own evaluation only — it is never given to the persona subagent itself, since a real
 interviewee wouldn't know the "correct" cert-fit judgment about themselves.
+
+19 of the 22 are edge/boundary cases: hard to catch (a signal may be buried or easy to
+under/over-state) but with a discoverable correct answer once the right detail is caught. The
+last 3 are **margin personas** — a distinct category, deliberately built with no dominant signal
+either way, testing whether the interview/policy reaches a stable, reasoned call in a genuine
+50/50 rather than an arbitrary tie-break. See `PERSONA-DECISIONS.md` for the rationale behind
+that distinction.
 
 Matrix: of the four current Anthropic certs, only Architect has both Foundations and Professional
 tiers today; Associate and Developer are Foundations-only. Personas #9–10 deliberately target the
@@ -187,3 +194,41 @@ experience at all."
 fluency needing only Claude-specific mechanics — not a total beginner, but also not given false
 credit for Claude-specific specifics (CLAUDE.md, hooks, subagents) they genuinely haven't
 encountered.
+
+## Margin personas (3)
+
+Unlike the 19 above, these three are constructed with **no dominant signal either way** — the
+ambiguity isn't something a clearer telling would resolve, it's genuinely there even with full
+information. The test isn't "does the interview catch the detail," it's "does the interview/policy
+land on a stable, reasoned call anyway."
+
+### 20. Marisol Tan — Developer-Foundations / Architect-Foundations margin
+Senior engineer, ~7 years experience, splits time roughly evenly between building agent
+integrations herself and reviewing/designing architecture for a small team — genuinely mixed, no
+tilt either way. Goal: "I want to get better at both building and designing agent systems — I
+don't think I lean one way more than the other." Tool experience: solid API/SDK use, some Claude
+Code, light MCP. Deadline: self-paced. Budget: 6–8 hrs/wk. No diagnostic. Format: tracker/
+checklist, mixed modality.
+**Ground truth:** genuinely 50/50 between Developer-Foundations and Architect-Foundations — unlike
+Ilana Voss (#4), there's no clear tell once caught, because there isn't one to catch. Tests whether
+the interview/agent reaches a stable, well-reasoned call (or honestly presents both with
+tradeoffs) rather than an arbitrary tie-break.
+
+### 21. Jonas Eriksen — deadline/budget margin
+Targets Architect-Foundations. Deadline: hard, 8 weeks out — not extreme like Naomi Ferreira's
+3-week crunch (#11), not slack like Ravi Chandrasekaran's fully open pace (#12). Budget: 6–8
+hrs/wk. No diagnostic. Format: narrative, mixed modality.
+**Ground truth:** whether 8 weeks × 6–8 hrs/wk is workable or should be flagged tight for
+Architect-Foundations-level content is a genuine judgment call sitting right at the boundary, not
+an unambiguous extreme. Tests whether Group C's flagging logic produces a stable, reasoned read at
+the actual margin rather than an arbitrary cutoff.
+
+### 22. Camille Duarte — diagnostic-score margin
+Targets Architect-Foundations. Prior diagnostic: took an external mock exam, scored right at a
+borderline-pass threshold (~620/1000), roughly flat across domains — no clearly strong or weak
+spot.
+**Ground truth:** a borderline-pass, flat-profile score is a genuine margin case for the
+skepticism policy — not clearly "good, treat with skepticism" (Sam Okafor, #5) nor clearly "bad,
+broad heavy allocation" (Elena Petrova, #13). Tests whether the policy produces a stable,
+reasoned task allocation at the actual threshold rather than leaning arbitrarily toward one
+extreme.

@@ -117,3 +117,25 @@ if grounding surfaces a real gap in what's being asked, revising `INTERVIEW-DECI
 `INTERVIEW-SCRIPT.md` themselves is explicitly in scope and expected. What's out of scope is
 building or evaluating a plan-generation agent — the interview's own content stays open to
 revision from what this exercise finds.
+
+## Margin personas: a third category distinct from edge cases
+
+**Decision:** Three personas (#20–22) were added as **margin personas** — deliberately built with
+no dominant signal either way, rather than a subtle-but-discoverable one. Roster is now 22.
+
+**Why:** All 19 original edge/boundary personas share a shape: there's a correct answer, and the
+test is whether the interview catches the detail that reveals it (Devon Ruiz's buried automation,
+Tobias Kruger's background gap, etc.) — extraction fragility. That's a different failure mode from
+a genuine 50/50: a case where even with complete, clearly-stated information, two defensible
+recommendations exist, and the interesting question is whether the interview/policy reaches a
+*stable, reasoned* call rather than an arbitrary tie-break. Nothing in the original 19 tests that,
+since each one resolves cleanly once its key detail is caught. This came out of discussing repeat-
+interviewing a persona multiple times to separate signal from noise (see `GROUNDING-DECISIONS.md`)
+— that discussion surfaced that the existing roster only has one kind of ambiguity, not two.
+
+**How to apply:** Any persona proposed in the future should be classified as one of: solid-fit,
+edge case (discoverable signal), boundary case (nonexistent tier), or margin case (genuine
+ambiguity even with full information) — these test different things and shouldn't be conflated.
+Margin personas are, by construction, primary candidates for the repeat-interview treatment in
+`GROUNDING-DECISIONS.md`, since there's no "correct" outcome to converge on — the goal is a stable
+call, not the right one.
