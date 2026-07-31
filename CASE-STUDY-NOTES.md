@@ -538,3 +538,50 @@ without being asked to persist it specifically.
 had future-session relevance and proactively saving it, rather than only applying it locally to
 the remaining turns of the current session — directly relevant to any case-study discussion of
 how personal/standing preferences get captured durably in an agentic workflow.
+
+---
+
+## 28. The persona/interviewer split broke in its first real pilot run — and the actual cause was different from anything discussed while designing it
+
+**Source: commit `d50e28d`** ("Supersede persona/interviewer split: collapse interviewer into
+orchestrator"), made by a separate concurrent session actually executing the grounding plan
+designed earlier in this same repo. Not from this session's own transcript — captured here per
+`CLAUDE.md`'s standing instruction that any session should log case-study-worthy moments it
+observes, including ones another session produced.
+
+The persona/interviewer split (item 18 above) was designed carefully, with a real empirical test
+behind it (the throwaway "reply with the word ready" spawn), and logged as a locked decision in
+`GROUNDING-DECISIONS.md`. Its first live pilot run, on persona #1 (Priya Nandakumar), broke
+immediately anyway — for a *different* reachability reason than the one the design had solved for.
+The persona's `SendMessage` replies don't route back to whichever subagent actually asked the
+question; they only resolve to `"main"`, the root of the whole session tree. Two-level nesting
+(orchestrator → persona) never exposed this, because the orchestrator *is* main and receives the
+reply correctly regardless. Three-level nesting (orchestrator → interviewer → persona) is fatal:
+the persona's answer routes past the interviewer straight to the orchestrator, and the interviewer
+— which asked the question and is waiting on the answer — never receives it at all. The pilot's own
+interviewer subagent confirmed this directly when asked to check: "Confirmed — I am NOT receiving
+the persona's replies directly... I'm nested one level down: you -> me -> persona." It reproduced
+on every turn, not as a one-off glitch.
+
+The fix: drop the interviewer subagent entirely. The orchestrator conducts every interview turn
+itself; only the one-shot, no-reply-needed step (comparing a finished transcript to ground truth
+and writing the grounding file) still gets delegated to a subagent, since a fire-and-forget spawn
+has no reply-routing problem to hit. The superseded section was struck through and left in place
+with a pointer to the replacement, following the same pattern used everywhere else in this repo's
+decision docs. Per the standing interruption policy set for this execution ("if anything interrupts
+a persona interview, drop the partial result and restart when resumed"), Priya Nandakumar's partial
+pilot transcript was discarded rather than salvaged, and her real Step 1 run was restarted clean
+under the corrected design — confirmed by the finished `groundings/01-priya-nandakumar.md` that
+exists under the new design, not the broken one.
+
+**Why notable:** A second instance of the exact same *class* of failure as item 18 (an assumption
+about subagent messaging mechanics that looked sound on paper and broke in first real use), but for
+a genuinely different underlying reason — this wasn't the same bug recurring, it was the same
+*kind* of gap (untested nesting-depth behavior) showing up one layer deeper than the first fix had
+reached. Worth pairing with item 18 in any public writeup as a two-part example: solving a problem
+empirically doesn't guarantee the fix generalizes to the next level of complexity built on top of
+it, and the honest response — evidenced here — is to test the next level for real (a live pilot,
+not just reasoning by analogy from the first fix) rather than assume it inherits the earlier fix's
+correctness. Also a clean, independent confirmation that the interruption/restart policy set for
+this execution phase was actually followed under real pressure to just patch and move on, not only
+stated as an intention beforehand.
