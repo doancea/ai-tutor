@@ -73,9 +73,15 @@ signal from an independent process. A subagent that reasons about its own person
 character introduces the same kind of realistic variance, omission, and phrasing a real
 interviewee would — which is the entire point of a grounding exercise.
 
-**How to apply:** Step 1 of the grounding plan resumes these existing subagents (via
+**How to apply:** ~~Step 1 of the grounding plan resumes these existing subagents (via
 `SendMessage`) rather than spinning up fresh one-off completions per question — continuity of
-character across the whole interview matters more than efficiency here.
+character across the whole interview matters more than efficiency here.~~ **Superseded — see
+`GROUNDING-DECISIONS.md`, "Persona/interviewer split and agent-handle mechanics."** The subagent
+tool has no human-name registry for ad-hoc spawns, and the original 19 personas' raw agent IDs
+weren't retained across an intervening context compaction, so they turned out not to be
+resumable as assumed here. Continuity of character still matters — it's just achieved
+differently than this line originally described, via a mechanism that's about running the
+grounding exercise rather than about the personas themselves, so it's logged separately.
 
 ## Ground-truth notes withheld from the persona subagents
 
@@ -106,3 +112,8 @@ scope creep from an interview-grounding exercise into building the thing it's me
 
 **How to apply:** Grounding findings should be phrased as "the interview did/didn't surface X,"
 never as "the agent did/didn't recommend Y" — the latter isn't yet a real capability to evaluate.
+This boundary is about generation logic specifically, not about the interview design being frozen:
+if grounding surfaces a real gap in what's being asked, revising `INTERVIEW-DECISIONS.md` /
+`INTERVIEW-SCRIPT.md` themselves is explicitly in scope and expected. What's out of scope is
+building or evaluating a plan-generation agent — the interview's own content stays open to
+revision from what this exercise finds.
