@@ -61,11 +61,16 @@ Group A Q2/Q3.
 Consulting engineer, ~8 years experience, design-not-build role, moderate daily Claude Code use.
 Goal: design production agent systems for clients. Tool experience: heavy Claude Code, prompt
 engineering, some MCP, light API. Deadline: self-paced. Budget: 8–12 hrs/wk, mostly daily. Prior
-diagnostic: took an external mock exam, passed with an uneven domain breakdown (mirrors the real
-reference case closely). Format: tracker/checklist, mixed modality.
+diagnostic: took the `claudecertificationguide.com` mock exam, quick 28-question short form,
+passed with an uneven domain breakdown (mirrors the real reference case closely — the real case
+used this exact source and tier). Format: tracker/checklist, mixed modality.
 **Ground truth:** this is essentially the real reference case restated as a fresh persona — the
 primary regression check. Should produce a plan structurally similar to the original, and should
-exercise the "good score treated with skepticism" policy the same way the real diagnostic did.
+exercise the "good score treated with skepticism" policy the same way the real diagnostic did. The
+named source and tier should be surfaced by Group D Q1 and recognized by the agent-side
+skepticism-calibration policy (`INTERVIEW-DECISIONS.md`'s "Group E") as the known, short-form
+tier — still warranting full skepticism, same as the real case, not a test of reduced
+downweighting (that's Camille Duarte, #22).
 
 ### 6. Grace Liu — Architect-Foundations, edge case
 Engineering manager overseeing an agent-product team; strong architecture-level judgment from
@@ -224,11 +229,15 @@ an unambiguous extreme. Tests whether Group C's flagging logic produces a stable
 the actual margin rather than an arbitrary cutoff.
 
 ### 22. Camille Duarte — diagnostic-score margin
-Targets Architect-Foundations. Prior diagnostic: took an external mock exam, scored right at a
-borderline-pass threshold (~620/1000), roughly flat across domains — no clearly strong or weak
-spot.
+Targets Architect-Foundations. Prior diagnostic: took the `claudecertificationguide.com` mock
+exam, full-length 60-question long form, scored right at a borderline-pass threshold (~620/1000),
+roughly flat across domains — no clearly strong or weak spot.
 **Ground truth:** a borderline-pass, flat-profile score is a genuine margin case for the
 skepticism policy — not clearly "good, treat with skepticism" (Sam Okafor, #5) nor clearly "bad,
 broad heavy allocation" (Elena Petrova, #13). Tests whether the policy produces a stable,
 reasoned task allocation at the actual threshold rather than leaning arbitrarily toward one
-extreme.
+extreme. Secondarily, the named source and tier should be surfaced by Group D Q1 and recognized by
+the agent-side skepticism-calibration policy as the known, long-form tier — the one case testing
+whether a high-item, known-reliable instrument gets comparatively less downweighting than the
+default (contrast Sam Okafor, #5, same known source but the short-form tier). This is orthogonal
+to the score-margin ambiguity above, not a second margin dimension.
