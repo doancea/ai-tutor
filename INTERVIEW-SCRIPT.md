@@ -1,10 +1,10 @@
-# INTERVIEW-SCRIPT.md — DRAFT, pending review
+# INTERVIEW-SCRIPT.md
 
 The literal question text implied by `INTERVIEW-DECISIONS.md` — that doc records *why* each
 question exists and its required/optional shape, but not the actual copy anyone (or any
 persona) would be asked. This is that instrument. Order follows the group sequence
-(A → B → C → D → F; Group E has no question, folded into a standing agent policy). Not yet used
-against any persona — this is Step 0 of the grounding plan, for review before Step 1 runs.
+(A → B → C → D → F; Group E has no question, folded into a standing agent policy). Reviewed and
+finalized; not yet run against any persona — that's Step 1 of the grounding plan.
 
 ## Group A — Role, goals, and target certification
 
