@@ -9,8 +9,9 @@ chronological.
 
 ## Parking lot — open topics not yet discussed
 
-- **TypeScript framework choice(s)** for the generalized app — not yet discussed, come back to
-  this before implementation starts.
+- **Certification scope for v1** — which tracks are actually in scope now vs. later.
+- **Agent invocation timing** — synchronous (interview submit blocks until a plan is ready) vs.
+  async (kick off generation, notify when done).
 
 ## Interview → agent → tracker integration, high level
 
@@ -28,9 +29,8 @@ Shape of the flow:
   instead of hand-seeded once).
 - The raw interview transcript is **not** persisted into the live per-user working store once
   it's been passed to the agent — the person has no further in-app use for their own answers
-  after the plan exists. It may optionally be appended to a separate, offline log for future
-  datamining, decoupled from what the app reads at runtime. The per-user working store holds
-  plan data only, same as today.
+  after the plan exists. (Superseded below: this is now ephemeral-only, not even logged offline.)
+  The per-user working store holds plan data only, same as today.
 - Generation is **not** a one-shot event run once at onboarding. Two already-locked interview
   behaviors require the agent to be invoked again later: Group D's "provisional plan pending an
   external diagnostic recommendation," and Group E's skepticism policy, which explicitly applies
@@ -38,12 +38,11 @@ Shape of the flow:
   diagnostic. So the agent needs to exist as a reusable generate/revise service callable at
   multiple trigger points (initial generation, diagnostic-result-driven revision, later
   reassessment) — not a setup script that runs once and is done.
-- Multi-user data isolation falls out of this: today `db.js` is one lowdb file for exactly one
-  person. Supporting other people needs either per-user files (`data/<userId>.json`) or a
-  `users`-keyed structure within one file. Per-user files likely preserve the
-  human-readable/hand-editable property `DECISIONS.md` valued for the original app, just at
-  per-user granularity — but this requires some identity concept, even a minimal one, since the
-  app currently has no notion of "who is this" at all.
+- ~~Multi-user data isolation falls out of this...~~ **Superseded — see "Single-user,
+  self-hosted scope decision" below.** This paragraph assumed one shared deployment serving many
+  people; v1 scope is single-user/self-hosted instead, which removes the isolation problem
+  entirely (the instance itself is the identity boundary). Left here, struck through rather than
+  deleted, in case scope ever expands to hosted/multi-tenant later.
 
 **Why:** Follows directly from tracing what currently exists vs. what "generate a plan from an
 interview" actually requires. The server-side-only constraint is a hard requirement of hosting
@@ -59,3 +58,42 @@ template/instance separation) should proceed from this shape — specifically, t
 schema/data-model decisions from here should assume: (1) a callable agent service, not a script,
 (2) plan data as the only thing persisted per user in the working store, (3) per-user isolation
 resolved before further schema decisions are finalized.
+
+## Single-user, self-hosted scope decision
+
+**Decision:** For v1, the generalized app is **single-user, self-hosted** — each person runs
+their own instance (their own copy/deployment), the same fundamental model as the original app,
+rather than one shared deployment serving many people. This resolves the identity/auth question
+raised above: there is no user table, no per-user keying, no login system, because the running
+instance itself is the identity boundary. Three things that follow from "self-hosted" were
+checked explicitly rather than assumed:
+
+- **API key**: provided by the host — i.e. whoever deploys/runs their own instance supplies their
+  own Anthropic API key, configured once as a server-side environment variable. It is never asked
+  as an interview question, never stored in the data store, and never exposed to client code.
+- **Stack/framework**: no change from the existing Express + React/Vite split. A Next.js move was
+  considered (motivated by wanting a unified client/server framework to run the agent call
+  server-side) but rejected on reflection — that reasoning was based on a mistaken premise that
+  the current app was an in-browser monolith. It already has a server/client split; Express
+  already gives the agent call a server-side home. No reason to change the architecture here.
+  Because the stack is unchanged, the lowdb file-based persistence question (raised when Next.js
+  /serverless hosting was on the table) is also moot — self-hosting still means a persistent
+  process the person runs themselves, same as the original app, not a serverless deployment where
+  a file-based store wouldn't reliably persist.
+- **Transcript handling**: tightened past "drop from the live store" (stated above) to "never
+  persisted at all" — interview answers are held only in memory for the duration of the
+  questionnaire → generation round-trip, then dropped. No offline log, no local retention, no
+  datamining use — that idea is fully retired, not just softened, since self-hosted removes any
+  channel back to a central collector and deliberately adding one would be its own consent/privacy
+  decision, not a byproduct of this one.
+
+**Why:** Single-user/self-hosted was an explicit, direct choice for v1 scope (not derived from
+anything else) — but each of the three sub-questions it raises needed checking rather than
+assuming, since "self-hosted" is a spectrum (bring-your-own-key vs. shared key; unified framework
+vs. keep the existing split; local retention vs. none) and the wrong assumption on any of them
+would have cascaded into schema and privacy decisions made by default rather than on purpose.
+
+**How to apply:** Multi-user isolation, auth, and hosted-deployment concerns are out of scope for
+v1 and shouldn't shape schema decisions going forward — schema work should assume exactly one
+user's data per running instance. Revisit the struck-through multi-user paragraph above only if
+scope explicitly expands beyond single-user/self-hosted later.
