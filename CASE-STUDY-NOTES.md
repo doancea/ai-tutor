@@ -585,3 +585,70 @@ not just reasoning by analogy from the first fix) rather than assume it inherits
 correctness. Also a clean, independent confirmation that the interruption/restart policy set for
 this execution phase was actually followed under real pressure to just patch and move on, not only
 stated as an intention beforehand.
+
+---
+
+## 29. The execution phase ran in a fundamentally different collaboration mode than the design phase
+
+**Source: session `0e24f891-282f-4e11-8bbe-fbf8dc9f8d1b`** (the same session that produced item 28's
+commit `d50e28d`, continuing on after it). The user's entire input to this session, from start to
+the point of this sweep, was one instruction: "execute the full plan. If anything interrupts a
+persona interview, drop the partial result and restart when resumed" — plus, much later, a single
+mid-run status check ("what is needed") and the request that produced this entry. Everything else —
+23 persona interviews (22 personas, one repeated pilot restart), 22 grounding-file writes, task
+tracking across 24 tracked units of work, a corrected architecture decision, a caught-and-fixed
+scope-boundary bug (item 30 below), and a full Step 3 cross-persona synthesis (`GROUNDING-FINDINGS.md`)
+— was carried out without further turn-by-turn direction, running as a background session across a
+multi-hour span (`sessionKind: "bg"` throughout the raw transcript) including one context
+compaction it resumed through cleanly (JSONL line ~1190) and one concurrent commit from a separate
+session working the same repo in parallel (`3bd1101`, adding `CLAUDE.md`, landing between this
+session's own commits without conflict).
+
+**Why notable:** Items 1–27 document a design phase built almost entirely on tight,
+turn-by-turn negotiation — propose, discuss, sign off, log (item 6) — where nearly every
+consequential decision involved explicit user back-and-forth. This session is the same overall
+engagement's execution phase, and it ran in the opposite mode: one upfront instruction, then
+autonomous multi-hour execution with no further steering needed until the user chose to check in.
+Worth keeping both modes in any public writeup as two ends of the same collaboration, not just the
+negotiation-heavy one — part of what made the loose-delegation mode viable at all was the dense
+up-front investment in the design phase (locked decision docs, a written interruption policy, a
+scope boundary already codified in `PERSONA-DECISIONS.md`) that gave the execution phase clear
+rules to run inside of without needing a human in the loop for every step.
+
+## 30. A writer-subagent hit a hard session-limit API failure; recovery used the persisted transcript, not a re-run — and the interruption policy was correctly *not* applied to it
+
+**Source: session `0e24f891-282f-4e11-8bbe-fbf8dc9f8d1b`**, JSONL lines 1173–1178
+(2026-07-31T12:59:57Z) through line 1293 (2026-07-31T16:22:51Z). After both independent interview
+runs for persona #19 (Farid Haidari) completed successfully and agreed ("2/2 consistent"), the
+one-shot writer subagent spawned to compare the transcripts against ground truth and write
+`groundings/19-farid-haidari.md` failed outright: "Agent terminated early due to an API error:
+You've hit your session limit · resets 12pm (America/New_York)" (line 1173). The session's next
+activity is a context-compaction resume at 16:11:43Z UTC (line 1190) — roughly 12:11pm
+America/New_York, just after the error's own stated reset time, suggesting the background session
+sat blocked until the limit cleared rather than retrying into it repeatedly. On resuming, rather
+than re-spawning another writer subagent (risking the same failure) or re-running Farid's two
+interviews from scratch, the orchestrator greped its own session's persisted JSONL transcript for
+the two runs' full answers — both were already fully captured, verbatim, in earlier tool-result
+content — and wrote `groundings/19-farid-haidari.md` directly (line 1293), skipping the subagent
+layer entirely for that one step.
+
+This also required a judgment call the user's stated policy didn't explicitly cover: the standing
+instruction was "if anything interrupts a **persona interview**, drop the partial result and
+restart when resumed" — but this failure wasn't an interview interruption at all. Both of Farid's
+interviews had already completed and agreed before the writer subagent ever ran; only the
+downstream write step failed. The orchestrator treated this as outside the policy's scope and did
+not discard or re-run the completed interview data, which would have been unnecessary rework the
+policy was never written to require.
+
+**Why notable:** Two distinct, stackable lessons from one incident. First, a second independent
+instance (after item 18's persona-name lookup failure and `CLAUDE.md` rule 4's own stated
+rationale) of the same underlying principle — a durable, persisted file survives where any
+particular agent's process, memory, or handle doesn't — this time applied by the orchestrator
+itself mid-execution rather than being a lesson the user had to propose. Second, a clean example of
+applying a stated rule to its actual scope rather than mechanically pattern-matching on
+surface similarity ("a subagent failed" ≠ "a persona interview was interrupted") — over-applying
+the interruption policy here would have silently thrown away two good, already-agreeing interview
+transcripts for no reason. Worth pairing with item 19 (the earlier `AskUserQuestion` pause on an
+infra failure) as a contrast: that case paused and asked because the right path was genuinely
+ambiguous; this one didn't need to ask, because the existing policy plus the persisted data made
+the right path unambiguous once examined closely.
