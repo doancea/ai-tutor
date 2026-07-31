@@ -150,3 +150,42 @@ evidence before Step 3 ever sees it.
 **How to apply:** Create `groundings/` when Step 1 execution actually starts — not before, since
 these files are analysis artifacts of runs that haven't happened yet. Sam Okafor's single careful
 run uses the single-pass shape with `category: regression-anchor`, not the repeat-tested one.
+
+## Step 3: cross-persona synthesis criteria and findings format
+
+**Decision:** A finding qualifies for `GROUNDING-FINDINGS.md` if it's backed by either (a)
+recurrence across ≥2 different personas, or (b) a repeat-tested persona's own internal split
+(e.g. `3/4 surfaced`) — its variance across independent runs is already systemic evidence on its
+own and doesn't need a second persona to corroborate it. A single miss in a single-pass persona
+with nothing else pointing at it does not qualify on its own, unless it's a hard structural
+failure (the script never asks for something a plan would need) that's attributable to the
+question's design regardless of who answered it.
+
+Each finding gets sorted into one of three dispositions:
+- **Interview-design gap** — candidate revision to `INTERVIEW-DECISIONS.md` / `INTERVIEW-SCRIPT.md`.
+- **Persona/methodology artifact** — candidate revision to `TEST-PERSONAS.md` /
+  `PERSONA-DECISIONS.md` / this file — e.g. a margin persona that resolves cleanly and
+  consistently wasn't actually constructed as ambiguously as intended.
+- **Out-of-scope observation** — noted, not actioned; about agent/plan-generation behavior that
+  doesn't exist yet.
+
+Synthesis runs once, after all 22 personas' Step 1–2 records are complete (including repeat-tested
+personas reaching their final aggregated verdict), not staged by category.
+
+**Why:** Single-pass personas were deliberately chosen because their signal wasn't expected to be
+fragile (see "Repeat-interviewing" above), so a lone miss among them is weak evidence on its own —
+treating it as a finding without corroboration would undercut the reasoning that put it in the
+single-pass group in the first place. Repeat-tested personas don't have that problem: their whole
+purpose is separating persona-generation noise from real interview fragility, so an internal split
+is already the systemic signal, not a precursor to one. Sorting by disposition keeps this
+consistent with the standing scope boundary (`PERSONA-DECISIONS.md`) — interview content stays
+open to revision, plan-generation behavior stays out of scope — and separates genuine interview
+findings from findings that are really about the test harness itself (e.g. a margin persona that
+turns out not to be ambiguous). A single holistic pass, rather than staged synthesis per category,
+is what's positioned to catch cross-category interactions (e.g. a Group A weakness affecting both
+edge-case and margin personas) that a staged pass could miss by construction.
+
+**How to apply:** Structure `GROUNDING-FINDINGS.md` as a numbered list, each entry with
+**Finding** (the pattern), **Evidence** (which personas/runs, specifically — not vague), and
+**Disposition** (one of the three buckets above). Evidence-first, same as every other doc in this
+set — a finding without a traceable pointer back to specific groundings doesn't get recorded.
