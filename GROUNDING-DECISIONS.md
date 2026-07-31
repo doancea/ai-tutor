@@ -110,3 +110,43 @@ the section above) independently, with no persona or interviewer agent reused ac
 
 Record one grounding file per persona containing every transcript run plus the final aggregated
 verdict, not a separate file per run.
+
+## Grounding file layout
+
+**Decision:** Each persona's Step 2 record lives at `groundings/NN-persona-name.md`, numbered to
+match its entry in `TEST-PERSONAS.md` (01–22). Every file carries light YAML frontmatter, then a
+Transcript section, a Comparison-against-ground-truth section, and a Verdict — shaped one way for
+the 12 single-pass personas and another for the 10 repeat-tested ones.
+
+Frontmatter:
+```yaml
+persona: 02
+name: Devon Ruiz
+category: edge-case          # solid-fit | edge-case | boundary-case | margin | regression-anchor
+repeat_tested: true
+runs: 4
+cap_hit: false
+verdict: "3/4 surfaced, 1 missed"
+```
+
+Single-pass personas: `## Transcript` (by group A–F, as applicable), `## Comparison against
+ground truth` (the persona's restated `Ground truth` line plus an assessment pointing at the
+specific group/question it hinges on), `## Verdict` (**Surfaced** / **Partial** / **Missed** plus
+one or two sentences).
+
+Repeat-tested personas: the same shape, but `## Transcript` contains one `### Run N` subsection
+per run — a full, uncondensed transcript each time, not a summary — followed by a per-run
+comparison (not a single blended narrative, so it's visible exactly which run(s) diverged), then
+the aggregated verdict per the format in "Repeat-interviewing" above.
+
+**Why:** Frontmatter is structure with a specific job — Step 3 has to scan across 22 files for
+cross-persona patterns, and free-text-only records would make that a rereading exercise rather
+than a scan, which is the same "structure only when it bounds something we'll actually use" test
+applied to interview-question design. Full, uncondensed transcripts per run (rather than a
+summarized diff) are kept deliberately verbose: the variance *between* runs is exactly what the
+repeat-interview mechanism exists to catch, and summarizing it away at record time would erase the
+evidence before Step 3 ever sees it.
+
+**How to apply:** Create `groundings/` when Step 1 execution actually starts — not before, since
+these files are analysis artifacts of runs that haven't happened yet. Sam Okafor's single careful
+run uses the single-pass shape with `category: regression-anchor`, not the repeat-tested one.
