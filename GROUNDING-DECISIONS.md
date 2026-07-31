@@ -38,14 +38,17 @@ also still upgrades the exercise from one consolidated single-message reply per 
 original Step 1 shape) to a genuine multi-turn interview — arguably a more faithful analog of a
 real one.
 
-**How to apply:** For each persona: spawn it fresh from its `TEST-PERSONAS.md` background only
+**How to apply:** ~~For each persona: spawn it fresh from its `TEST-PERSONAS.md` background only
 (never the Ground Truth line), capture its `agentId`, and hold that ID only as long as that
 persona's interview is in progress — safe to discard once its transcript is complete. Then spawn
 one interviewer subagent, hand it the full `INTERVIEW-SCRIPT.md` and the persona's `agentId`, and
 let it conduct the whole interview in that single invocation — asking each group's question(s) via
 sequential `SendMessage` calls to the persona, handling conditional branches as they come up, and
 returning the complete transcript at the end. No `agentId` needs to persist past its own persona's
-interview, and the interviewer never needs one at all.
+interview, and the interviewer never needs one at all.~~ **Superseded — see "Interviewer role
+collapsed into the orchestrator" below.** A live pilot run showed the persona/interviewer split as
+described here doesn't actually work: the persona's replies can't route back to an intermediate
+interviewer subagent at all.
 
 ## Repeat-interviewing: which personas, how many times, how aggregated
 
@@ -189,3 +192,56 @@ edge-case and margin personas) that a staged pass could miss by construction.
 **Finding** (the pattern), **Evidence** (which personas/runs, specifically — not vague), and
 **Disposition** (one of the three buckets above). Evidence-first, same as every other doc in this
 set — a finding without a traceable pointer back to specific groundings doesn't get recorded.
+
+## Interviewer role collapsed into the orchestrator
+
+**Decision:** Drop the separate interviewer subagent entirely. The orchestrator (the top-level
+session directing the grounding exercise) conducts every interview directly against the persona
+subagent — spawning the persona, then asking each Group A–F question itself via `SendMessage`,
+handling branches, and assembling the transcript in its own context. The only thing still
+delegated to a subagent is the one-shot, non-conversational step of comparing a finished
+transcript against ground truth and writing the `groundings/NN-persona-name.md` file.
+
+**Why:** A live pilot run on persona #1 (Priya Nandakumar) tried the design in "Persona/interviewer
+split and agent-handle mechanics" above literally — orchestrator spawns interviewer, interviewer
+spawns persona and messages it directly. It broke immediately: the persona's `SendMessage` replies
+have no way to address an intermediate parent. The persona only sees a generic `from=` label (its
+spawner's subagent type, e.g. `general-purpose`) on the incoming question, tries to reply to that
+label, gets "no agent... reachable" (the label isn't a unique resolvable address), and falls back
+to `"main"` — which is the true root of the whole session tree, not whichever agent actually sent
+the message. For two-level nesting (orchestrator → persona) this is invisible, because the
+orchestrator *is* main and receives the reply correctly. For three-level nesting (orchestrator →
+interviewer → persona) it's fatal: the interviewer sends a question, the persona's answer routes
+past it straight to the orchestrator, and the interviewer has no way to receive it at all — it has
+to fully stop and wait to be resumed with the answer relayed in by hand. Confirmed directly by the
+pilot's own interviewer agent after being asked to check: "Confirmed — I am NOT receiving the
+persona's replies directly... I'm nested one level down: you -> me -> persona." This isn't a
+one-off routing glitch; it reproduced on every single turn of the pilot (Group A Q1, then Q2/Q3),
+each requiring a manual relay round-trip. That fully defeats the point of delegating the interview
+to a subagent — the orchestrator ends up doing the same amount of per-turn work either way, plus
+relay overhead, plus an idle interviewer subagent that contributes nothing.
+
+This is the same underlying constraint "Persona/interviewer split and agent-handle mechanics"
+already found (no human-readable name registry for ad-hoc spawns) — that decision's fix was "only
+the persona needs a persistent handle, and only the orchestrator needs to hold it." What that pass
+missed is that the *interviewer* needed a persistent, resolvable handle too, for the reply leg, and
+none is available for a non-root agent. Two-level nesting sidesteps the problem entirely rather
+than working around it, because `"main"` is always resolvable and the orchestrator always *is*
+main.
+
+**How to apply:** For each persona: spawn it fresh from its `TEST-PERSONAS.md` background only
+(never the Ground Truth line), capture its `agentId`. Conduct the full Group A–F script directly —
+send each question via `SendMessage` to that `agentId`, read the reply (delivered automatically to
+main), decide the next question/branch, repeat until the script is complete. Discard the `agentId`
+once the persona's interview (or, for repeat-tested personas, that one run) is done. Once a
+transcript is complete, hand it off — along with the persona's ground truth line, its category, and
+the file-layout spec earlier in this file — to a one-shot subagent whose only job is to compare and
+write the grounding file; that step is a single fire-and-forget spawn with no reply leg, so nesting
+is fine there. This lets file-writing run in the background/parallel across personas while
+interviewing stays sequential (or lightly interleaved across a small cohort of personas at once, by
+tracking each one's live `agentId` and current script position) in the orchestrator itself.
+
+Confirmed by direct pilot observation rather than assumption; per the standing interruption policy,
+the persona #1 pilot's partial transcript (produced under the broken three-level design) was
+dropped rather than salvaged — persona #1's real Step 1 run restarts clean under this corrected
+design.
