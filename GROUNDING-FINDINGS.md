@@ -7,8 +7,9 @@ format" section — reproduced here only by reference, not restated.
 
 ## Scoreboard
 
-All 22 personas resolved to a final verdict of **Surfaced** (12 single-pass + Sam Okafor's careful
-single run) or **2/2 consistent** (10 repeat-tested personas, including all 3 margin personas). No
+All 22 personas resolved to a final verdict of **Surfaced** (11 single-pass, plus Sam Okafor's
+careful single run, for 12 total) or **2/2 consistent** (10 repeat-tested personas, including all 3
+margin personas). No
 persona produced a final **Partial** or **Missed** verdict, and no repeat-tested persona needed a
 run beyond the 2-run floor — none approached the 7-run cap. Two single-pass groundings (#10, #11)
 passed through an intermediate incorrect "Partial" verdict before being corrected; see Finding 3.
@@ -62,8 +63,9 @@ plan-generation behavior (would an agent that doesn't exist yet make the right c
 scoping the verdict to whether the interview transcript itself surfaced the needed signal — a
 direct violation of `PERSONA-DECISIONS.md`'s standing scope boundary. Both were manually corrected
 after review. An explicit scope-note paragraph was added to every subsequent writer-agent prompt
-starting with persona #12, and the error did not recur in any of the 12 groundings written after
-the fix (including 6 more repeat-tested personas with more complex verdict logic).
+starting with persona #12, and the error did not recur across the 11 groundings written from
+persona #12 onward (personas #12–22, including 6 more repeat-tested personas with more complex
+verdict logic).
 
 **Evidence:** `groundings/10-omar-farouk.md` and `groundings/11-naomi-ferreira.md` — both now read
 `verdict: "Surfaced"` and correctly scope the Verdict section to interview-surfaced signal only,
@@ -71,10 +73,11 @@ but both were edited post-hoc from an original "Partial" that conflated intervie
 unverifiable downstream agent behavior.
 
 **Disposition:** Persona/methodology artifact — already actioned within this run (scope-note fix
-applied from persona #12 onward). Recommend codifying the fix permanently: append the scope-note
-requirement to `GROUNDING-DECISIONS.md`'s "Grounding file layout" section as a mandatory part of
-any future writer-agent prompt template, so the fix survives past this specific run's improvised
-correction rather than remaining implicit.
+applied from persona #12 onward), and now codified permanently: `GROUNDING-DECISIONS.md`'s
+"Interviewer role collapsed into the orchestrator" section — where the writer-subagent handoff
+itself is specified — requires the scope note as a mandatory part of any future writer-agent
+prompt, so the fix survives past this specific run's improvised correction. See also
+`CASE-STUDY-NOTES.md` for the fuller incident account.
 
 ### 4. Group D's diagnostic follow-up doesn't distinguish a precise external score from a hedged, self-reported one
 
@@ -92,29 +95,51 @@ who didn't happen to volunteer it.
 "a good future stress-test of Group D's fallback/verification path" and notes the real case had no
 equivalent ambiguity to test against.
 
-**Disposition:** Interview-design gap — candidate revision to `INTERVIEW-SCRIPT.md` Group D Q1's
-follow-up, e.g. an optional sub-question on how confident/precise the recalled score is, so a
-downstream agent can distinguish "solid external number, act on it directly" from "soft recall,
-verify or reconstruct before relying on it" without depending on the persona volunteering that
-distinction unprompted.
+**Disposition:** Interview-design gap — actioned. Resolved not with a confidence/precision
+self-report (which would repeat the reasoning already rejected in `INTERVIEW-DECISIONS.md`'s
+"self-assessed test-validity question, dropped from Group D") but by capturing the assessment's
+*source* alongside its result, and pushing reliability calibration to an agent-side, source-based
+vetting policy instead of a person's self-assessment. Group D Q1 is broadened to "any assessments
+related to this goal or a similar topic," its "Yes" follow-up now asks for the source alongside
+the result, and the "Group E" skepticism policy is recalibrated from a flat rule to one
+conditioned on source reliability (e.g. `claudecertificationguide.com`'s documented short/long
+tiers). See `INTERVIEW-SCRIPT.md` (Group D Q1) and `INTERVIEW-DECISIONS.md` (Group D Q1 and Group
+E sections) for the resulting design; `DECISIONS.md` is left untouched as the historical record of
+the original single-source case this generalizes from.
 
-### 5. Group F's single-select format options don't accommodate a legitimately blended preference
+### 5. Conversational-format grounding can't validate whether real users would actually use a bucketed question's `Other` escape valve
 
-**Finding:** `INTERVIEW-SCRIPT.md` Group F Q1 offers three mutually exclusive format buckets
-(tracker/checklist, narrative document, loose/high-level guidance). One persona's genuine
-preference didn't map cleanly onto any single bucket — it blended checklist-like structure with an
-explicit non-rigid caveat, plus a narrative component for the "why." This is attributable to the
-forced single-select design itself, not to that persona's phrasing — any persona with a similarly
-blended real preference would hit the same gap.
+**Finding:** `INTERVIEW-SCRIPT.md` Group F Q1 is documented as "bucketed + Other"
+(`INTERVIEW-DECISIONS.md`, Group F Q1 & Q2 section), with a free-text `Other: ______` option
+already present specifically to catch answers that don't fit the three named buckets
+(tracker/checklist, narrative document, loose/high-level guidance) — the script content is
+correctly designed, not missing an escape valve. But this grounding exercise conducts every
+interview conversationally (per "Interviewer role collapsed into the orchestrator" in
+`GROUNDING-DECISIONS.md`): the orchestrator asks questions via `SendMessage` and personas answer in
+free prose, so no persona is ever actually forced through the literal choice a real end-user will
+face in the shipped form UI. Casey Whitfield's answer — "loose checklist or set of milestones
+rather than a rigid tracker... narrative explanation for the why" — blends checklist structure with
+an explicit non-rigid caveat plus a narrative component, genuinely not a clean fit for a single
+bucket. The conversational transcript captured all of that nuance faithfully, but that says nothing
+about whether a real user with the same underlying preference would click `Other` and write it out,
+versus just clicking the closest single bucket ("tracker/checklist") and losing the nuance to
+ordinary form satisficing.
 
-**Evidence:** `groundings/15-casey-whitfield.md`'s Comparison section, flagged there as "a minor
-script-fit observation" separate from (and not affecting) that persona's main verdict.
+**Evidence:** `groundings/15-casey-whitfield.md`'s Comparison section, flagging the bucket-fit
+mismatch; `INTERVIEW-DECISIONS.md` (Group F Q1 & Q2 section) confirming Q1 is "bucketed + Other" by
+deliberate design.
 
-**Disposition:** Interview-design gap — candidate revision to `INTERVIEW-SCRIPT.md` Group F Q1,
-e.g. allowing a "combination" option or brief free-text elaboration alongside the bucketed choice,
-rather than forcing a single exclusive pick.
+**Disposition:** Persona/methodology artifact — not a revision candidate for
+`INTERVIEW-SCRIPT.md` (the script already has the right shape). Worth noting in
+`GROUNDING-DECISIONS.md` as a structural blind spot of conversational-format grounding: it validates
+that the interview's *semantic content* can capture a given signal, not that a real user
+interacting with the eventual form UI will reach for the right option under normal form friction.
+Applies to every bucketed+Other question, not just this one; Casey's transcript is simply the one
+concrete illustration on hand. See Finding 6c for the corresponding forward-looking UI-design note.
 
-### 6. Diego Fuentes' loose/high-level guidance preference has no home in the current tracker-shaped plan data model
+### 6. Out-of-scope observations for the future plan-generation layer
+
+**6a. Diego Fuentes' loose/high-level guidance preference has no home in the current tracker-shaped plan data model**
 
 **Finding:** Diego's Group F Q1 answer is an explicit, unhedged preference for loose/high-level
 guidance over tracker/checklist structure — cleanly surfaced by the interview with no ambiguity.
@@ -131,6 +156,45 @@ which doesn't exist yet. Noted here for whenever that layer is designed, not act
 surfacing early since it's a design constraint (can the data model represent a non-checklist plan
 at all) rather than a content question, and may be cheaper to accommodate from the start than to
 retrofit.
+
+**6b. Mismatch-flagging logic should treat skill-level gaps and role-scope mismatches as separate code paths**
+
+**Finding:** Tobias Kruger (#8) and Whitney Cole (#16) were independently constructed to test two
+structurally distinct named-target mismatch types — a skill-level gap (the demonstrated background
+doesn't support the named top-tier target, regardless of who chose it) and a role-scope mismatch
+(the demonstrated skill is adequate, but the named target's content-shape doesn't match what the
+actual goal needs). Both were caught cleanly by the interview (see Finding 1), so this isn't an
+interview-design gap — it's forward guidance for the not-yet-built mismatch-flagging logic itself,
+surfaced because both grounding files independently flagged the distinction without cross-reading
+each other.
+
+**Evidence:** `groundings/08-tobias-kruger.md` and `groundings/16-whitney-cole.md`, both 2/2
+consistent, both explicitly noting the structural difference from the other case.
+
+**Disposition:** Out-of-scope observation — the mismatch-flagging logic doesn't exist yet. Noted
+here so that whenever it's designed, it treats these as two separate code paths rather than one
+generic "named target didn't fit" bucket, rather than actioned now.
+
+**6c. Bucketed-choice questions risk losing nuance to form satisficing once a real checkbox UI exists**
+
+**Finding:** A real end-user filling out a literal form (checkboxes plus an `Other` free-text
+field, per the locked v1 scope) faces a documented UX tendency to pick the closest pre-built option
+rather than take the extra step of selecting `Other` and writing a free-text answer — especially
+when one bucket is "close enough." For a blended preference like Casey Whitfield's (Group F Q1:
+checklist structure, but explicitly non-rigid, plus a narrative "why" component), this creates a
+real risk that a user just clicks "tracker/checklist" and the plan-generation layer never sees the
+nuance at all. This can't be tested by this exercise's conversational-format grounding (see Finding
+5), since no persona is ever actually forced through the literal choice.
+
+**Evidence:** `groundings/15-casey-whitfield.md` (the blended answer); `INTERVIEW-DECISIONS.md`
+(Group F Q1 & Q2 section, confirming Q1's "bucketed + Other" design).
+
+**Disposition:** Out-of-scope observation — this is about the not-yet-built form UI (and possibly
+the plan-generation layer's handling of `Other` free text), not the interview script's content,
+which is already correctly shaped. Noted here for whenever that UI is designed: consider whether
+`Other` needs UI treatment that makes it inviting rather than a last resort (e.g., an
+always-visible optional free-text elaboration field alongside the bucketed choice, rather than only
+appearing as a fallback), so blended answers don't get lost to the path of least resistance.
 
 ### 7. Two structurally distinct named-target mismatch types were both caught cleanly and shouldn't be conflated
 
@@ -149,6 +213,7 @@ each other.
 consistent, both explicitly noting the structural difference from the other case.
 
 **Disposition:** Persona/methodology artifact — confirmation, not a revision candidate.
-`PERSONA-DECISIONS.md`'s deliberate construction of two distinct mismatch types works as intended;
-worth flagging explicitly here so that any future mismatch-flagging logic (or documentation of it)
-treats these as two separate code paths rather than one generic "named target didn't fit" bucket.
+`PERSONA-DECISIONS.md`'s deliberate construction of two distinct mismatch types works as intended.
+(The forward-looking implication for future mismatch-flagging logic is split out as Finding 6b,
+since that's an out-of-scope observation about a layer that doesn't exist yet, not a
+persona/methodology revision.)

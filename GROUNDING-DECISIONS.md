@@ -245,3 +245,17 @@ Confirmed by direct pilot observation rather than assumption; per the standing i
 the persona #1 pilot's partial transcript (produced under the broken three-level design) was
 dropped rather than salvaged — persona #1's real Step 1 run restarts clean under this corrected
 design.
+
+The one-shot writer-subagent prompt must include an explicit scope note: for any ground truth
+phrased in terms of what "the agent" should do, the writer's verdict is based only on whether the
+interview itself surfaced the necessary raw information clearly enough for a future agent to act
+on — never on whether a downstream plan-generation agent (which doesn't exist yet) would in fact
+act on it correctly. Without this, the writer conflates interview fidelity with unverifiable
+downstream agent behavior, producing a false "Partial"/"Missed" verdict for a transcript that
+actually surfaced its signal cleanly. This is a standing requirement, not a one-off caveat — every
+writer-subagent prompt needs it, since any persona's ground truth can be phrased in terms of
+downstream agent behavior. See `GROUNDING-FINDINGS.md` Finding 3 for the concrete failure this
+guards against (personas #10 and #11 were both initially mis-verdicted "Partial" on exactly this
+conflation before manual correction) and `CASE-STUDY-NOTES.md` for the fuller incident account,
+including why the fix still had to be applied a second time for a persona already in flight when it
+landed.

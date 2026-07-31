@@ -652,3 +652,98 @@ transcripts for no reason. Worth pairing with item 19 (the earlier `AskUserQuest
 infra failure) as a contrast: that case paused and asked because the right path was genuinely
 ambiguous; this one didn't need to ask, because the existing policy plus the persisted data made
 the right path unambiguous once examined closely.
+
+## 31. A writer-subagent scope-boundary bug was caught, fixed forward in the next prompt, and still had to be caught a second time for a persona already in flight when the fix landed
+
+**Source: session `0e24f891-282f-4e11-8bbe-fbf8dc9f8d1b`**, JSONL lines 466–563
+(2026-07-31T12:43:21Z through 12:45:41Z). With several persona interviews and their one-shot writer
+subagents running concurrently (personas 09–12 in flight at once), the orchestrator read back
+`groundings/10-omar-farouk.md` and caught the writer's own mistake directly: "The writer for
+persona 10 misapplied the scope boundary — it marked the verdict 'Partial' because it couldn't
+verify *downstream agent behavior*, but that's explicitly out of scope per PERSONA-DECISIONS.md;
+the interview's only job is to surface the signal, which it did cleanly. Let me correct this."
+(line 471). It hand-edited persona 10's frontmatter and verdict prose in place (lines 472–474),
+then reasoned forward rather than treating it as a one-off: "I'll add scope-boundary guidance to
+future writer prompts to prevent this same mistake recurring (several other personas have 'agent
+should...' ground truths)" (line 487).
+
+The very next writer dispatch — persona 12 — carried the fix: an explicit "IMPORTANT scope note"
+paragraph telling the writer subagent its verdict "must be based ONLY on whether the interview
+itself surfaced the necessary raw information... not on whether a plan would in fact avoid
+over-packing, which this transcript cannot demonstrate either way," closing with "if the raw signal
+was surfaced cleanly, that's a 'Surfaced' verdict, with the downstream-behavior caveat noted as an
+aside, not as a modifier of the verdict itself." Persona 12 came back clean ("Persona 12 done
+correctly with the scope guidance applied," line 537). But persona 11 (Naomi Ferreira) had already
+been dispatched *before* the fix went in, in that same concurrent batch, and came back with the
+identical bug: "Same scope-boundary mistake as persona 10 (I hadn't added the caveat yet when I
+dispatched this one). Let me check and fix it." (line 552), followed by the same hand-correction
+(line 563).
+
+**Why notable:** The fix worked exactly as intended going forward — no recurrence in any of the 11
+groundings written from persona 12 onward — but a fix applied at "the next dispatch" doesn't
+retroactively cover work already in flight when personas are being run concurrently rather than
+strictly sequentially. The orchestrator had to independently re-catch the identical bug a second
+time for persona 11, purely because of dispatch ordering, not because the fix itself was wrong.
+Worth keeping as a concrete illustration of a general hazard in concurrent/batched subagent
+orchestration: "I fixed the prompt template" and "the fix is now in effect everywhere" are not the
+same claim once multiple instances are already mid-flight — verifying the latter requires checking
+each in-flight instance individually rather than trusting the fix's dispatch time as a clean
+cutoff.
+
+## 32. A proposed interview-design fix collided with an already-rejected decision; separating self-report opinion from objective provenance saved it, and generalizing exposed a single-user policy as idiosyncratic
+
+**JSONL lines 295–444** (2026-07-31T20:08–20:50Z, same session as items 29–31). While reviewing
+`GROUNDING-FINDINGS.md` Finding 4 (Group D's diagnostic follow-up doesn't distinguish a precise
+external score from a hedged, self-reported one), the assistant proposed adding a
+confidence/precision sub-question to Group D Q1 — then, re-checking `INTERVIEW-DECISIONS.md`
+before drafting it, found this looked structurally identical to an already-rejected decision: a
+self-assessed test-validity question, dropped specifically because self-reported confidence
+carries the same bias problem as the score itself and doesn't change the agent's fixed skepticism
+policy either way. Flagged this collision directly rather than drafting the fix as if it were
+novel.
+
+The user's response reframed rather than defended the original proposal: "Maybe the sentiment
+question is detracting from the goal here. How would that tie in with your read of the finding?"
+That question separated two things that had been getting treated as one — asking the person to
+*judge* their own score (rejected, inert) versus asking a *factual* question about the assessment's
+provenance (not the same kind of thing, and not previously considered). This unstuck the finding
+and led into a concrete idea: the user's own real diagnostic history included a specific external
+site (`claudecertificationguide.com`) with two mock-exam tiers (28-question short form, 60-question
+long form), and using which tier was taken as an objective reliability signal, rather than asking
+anyone to self-assess confidence.
+
+The user then asserted the site's own documentation stated the short form has lower correlation
+with real exam performance than the long form. Before writing that into a decision doc, the
+assistant checked it live via `WebFetch` — four fetches across three pages
+(`/mock-exam`, homepage, `/about`) — and found no such disclaimer anywhere on the current site. The
+user didn't insist on the original claim; instead: "ah, the correlation is implied through sample
+size, not necessarily a claim they make" — converting an unverifiable citation into a defensible,
+general statistical inference (more items, lower variance) that didn't need the site's endorsement
+at all. Separately, a repo grep of `ccarf-app/docs/` independently confirmed the two-tier site and
+that the original reference case's real 737/1000 score was itself the *short*-form result — a fact
+neither party had stated going in.
+
+The design discussion continued and the user named the deeper issue directly: `DECISIONS.md`'s
+"treat every score with skepticism" policy was calibrated to their own specific risk-aversion in
+the original single-user build (not wanting a good score to cause the plan to skip material they
+genuinely needed), not derived as a universal principle — and as the app generalizes to other
+users, that distinction needed to be made explicit rather than carried forward silently. The
+resulting design (three edits, this session): `INTERVIEW-DECISIONS.md`'s "Group E" policy shifted
+from a flat rule to one calibrated by source reliability; Group D Q1 broadened and restructured
+around results the person is "willing to share" (three options: yes/no/no-but-willing) rather than
+"have you taken one," specifically to stop conflating "took an assessment" with "can produce a
+reliable result from it"; and `DECISIONS.md` was deliberately left untouched as the historical
+record the generalized policy reasons *from*, not a doc to retroactively rewrite.
+
+**Why notable:** Three stacked lessons in one continuous thread. First, checking a new proposal
+against the project's own log of previously-rejected ideas before treating it as novel — the
+collision wasn't obvious from the proposal's surface wording, only from rereading
+`INTERVIEW-DECISIONS.md` directly. Second, a live fact-check that disproved the specific claim
+("the site says so") without disproving the underlying idea — the user's own correction downgraded
+an uncitable claim into a stronger, self-contained one, which is a better outcome than either
+blindly trusting the original claim or dropping the idea once it failed verification. Third, and
+most durable for the generalization effort overall: a policy that had been sitting unquestioned in
+a "locked" decision doc turned out to encode one person's specific risk preference, and only
+became visible as such when the work of generalizing to other users forced someone to ask why the
+rule existed in the first place — worth watching for elsewhere in `DECISIONS.md` as more of it gets
+reverse-engineered into general policy.

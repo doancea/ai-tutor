@@ -72,15 +72,18 @@ How does that time tend to show up?
 ## Group D — Prior diagnostic
 
 **Q1** *(required)*
-Have you already taken a diagnostic or mock exam relevant to this goal?
-- [ ] Yes
+Do you have results from an assessment related to this goal (or a similar topic) that you're
+willing to share?
+- [ ] Yes — I have results to share
 - [ ] No
+- [ ] No, but I'd be willing to take one
 
-*If "Yes" →* required follow-up: What was your score, and if you have a domain/topic breakdown,
-share that too. *(free text)*
+*If "Yes" →* required follow-up: Share your results — paste the raw output if you still have it,
+otherwise describe what you remember — and where the assessment was from. *(free text)*
 
-*If "No" →* no further question here — sourcing a viable existing diagnostic (or, failing that,
-constructing one) is agent-side behavior, not something asked of you.
+*If "No" or "No, but I'd be willing to take one" →* no further question here — sourcing a viable
+existing diagnostic (or, failing that, constructing one) is agent-side behavior, not something
+asked of you.
 
 ## Group F — Plan format and learning modality
 
