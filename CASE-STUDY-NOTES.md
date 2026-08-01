@@ -747,3 +747,43 @@ a "locked" decision doc turned out to encode one person's specific risk preferen
 became visible as such when the work of generalizing to other users forced someone to ask why the
 rule existed in the first place — worth watching for elsewhere in `DECISIONS.md` as more of it gets
 reverse-engineered into general policy.
+
+## 33. A fix already on record ("don't split the interviewer out") got reapplied one layer up without being recognized as the same bug, because it had been named after a role instead of the underlying mechanism
+
+**JSONL lines 641–683** (2026-07-31T21:13–21:17Z, this session, after a context compaction). Having
+just closed out the Group D redesign (entry 32) and its associated `TEST-PERSONAS.md` tweaks, the
+assistant set out to re-ground personas #5 (Sam Okafor), #9 (Helena Brandt), #10 (Omar Farouk), and
+#22 (Camille Duarte) under the new script. Per the user's instruction to hand off execution, the
+assistant delegated the *entire task — including the orchestrator role itself* — to a background
+`general-purpose` sub-agent, instructing it to run the Group A–F interview loop directly against
+freshly-spawned persona sub-agents for all four.
+
+To do that, the delegated sub-agent had to spawn persona sub-agents of its own. Their replies never
+reached it: they routed instead to the true session root, arriving in the orchestrating session as
+unsolicited, context-free messages — partial Group A answers from "Sam Okafor run 1," "Sam Okafor
+run 2," "Helena Brandt run 1/2," "Omar Farouk run 1/2" (Camille Duarte never started at all). The
+delegated sub-agent stalled mid-task, its final message reading "I'll pause tool calls here and
+wait for the remaining Group A notifications to arrive," and its task status reported `completed`
+despite having written zero grounding files. A `git status` / `ls groundings/` check confirmed all
+four canonical files were missing; only the pre-redesign archives remained.
+
+This is the identical failure `GROUNDING-DECISIONS.md`'s "Interviewer role collapsed into the
+orchestrator" section already documents and fixed: a non-root agent can't receive replies from
+personas it spawns, because those replies always resolve to the literal session root regardless of
+who asked the question. That section's fix had been framed narrowly — "don't split a separate
+interviewer subagent out from the orchestrator" — rather than structurally — "the party running the
+interview must be the actual session root." Because the rule was tied to a role name rather than
+the underlying routing mechanism, it didn't visibly apply when the identical mistake resurfaced
+wearing a different label ("orchestrator," this time, delegated wholesale to a background agent).
+It took hitting the failure a second time, in a different shape, before the two incidents were
+recognized as the same bug — at which point `GROUNDING-DECISIONS.md` was amended with an explicit
+addendum generalizing the rule.
+
+**Why notable:** A previously-documented, previously-fixed bug recurred not because the lesson was
+forgotten, but because it had been written down as a rule about a *role name* instead of the
+*mechanism* that made the role dangerous — worth remembering when writing any "don't do X"
+decision-doc entry: state the mechanism, not just the symptom, or the same mechanism slips back in
+wearing a different name. Also a concrete illustration of a standing hazard with background-task
+notifications: a `completed` status describes that the sub-agent's own turn ended, not that its
+assigned work finished — this one ended itself mid-task with an explicit "I'll pause and wait," and
+nothing ever resumed it afterward.

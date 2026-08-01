@@ -259,3 +259,19 @@ guards against (personas #10 and #11 were both initially mis-verdicted "Partial"
 conflation before manual correction) and `CASE-STUDY-NOTES.md` for the fuller incident account,
 including why the fix still had to be applied a second time for a persona already in flight when it
 landed.
+
+**Addendum — the constraint applies to the orchestrator role itself, not just to a separated
+interviewer.** The failure mode above resurfaced one layer up. Delegating the *whole orchestrator
+role* to a sub-agent reproduces the identical bug, because that sub-agent still isn't the session
+root — even though it's root-like relative to whatever it spawns beneath it. Confirmed when
+re-grounding personas #5, #9, #10, and #22 under the redesigned Group D script was handed to a
+background `general-purpose` sub-agent instructed to act as orchestrator: it spawned its own
+persona sub-agents to conduct the interviews (mirroring "How to apply" above), but each persona's
+`SendMessage` reply routed past it to the true session root instead, arriving there as unsolicited
+messages with no interview context attached. The delegated sub-agent stalled mid-task ("I'll pause
+tool calls here and wait for the remaining Group A notifications to arrive") and reported
+`status: completed` without writing a single grounding file for any of the four personas — a
+`completed` status describes that the sub-agent's own turn ended, not that its assigned work
+finished. **Rule:** the party conducting Group A–F against personas must be the actual session
+root — never a sub-agent, regardless of how the role is framed in its spawn prompt. See
+`CASE-STUDY-NOTES.md` for the fuller account.
