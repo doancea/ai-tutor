@@ -824,3 +824,56 @@ notable for what it explicitly excludes: this total only covers the background s
 self-reported figures, not the orchestrating session's own token usage for the `SendMessage`/`Agent`
 calls, file reads, and reasoning that drove them — a deliberately partial number, flagged as such
 rather than presented as the true total cost of the exercise.
+
+## 35. A scheduled/cron-fired session re-verified the "orchestrator must be the actual session root" rule from a genuinely different angle — and the Group D Q1 widening fix it was sent to check held for both personas
+
+**Source: this session** (`96ed16d9-510a-5495-bd8e-36ace9e26340`), fired automatically by the
+`/reground-9-10` scheduled routine on 2026-08-01 with no live user present. Task: re-ground
+personas #9 (Helena Brandt) and #10 (Omar Farouk) under the Group D Q1 wording widened in commit
+`bf11b96`, to check whether it actually fixed the failure `GROUNDING-FINDINGS.md` Finding 8
+documented (both personas answering "No"/hedged to the old Group D Q1 wording despite volunteering
+a held prior-tier certification unprompted in Group A).
+
+The task prompt itself was framed around a mechanism risk, not just the content question: entries
+31 and 33 above document the "interviewer/orchestrator must be the true session root" bug
+recurring twice because it had been named after a role rather than the underlying routing
+mechanism. The prompt's hard constraint explicitly called out that a *scheduled/cron-triggered*
+session is itself the session root — untested territory, since entries 28–34's executions all ran
+from an interactively-started session (even when later continuing unattended in the background).
+This run is the first direct test of that specific claim: the fired session spawned both persona
+subagents itself and conducted every Group A–F turn directly via `SendMessage`, with no
+intermediate orchestrator or interviewer layer at any point. Every reply routed back correctly on
+the first attempt, across two personas run concurrently, ten total interview turns, and two
+writer-subagent dispatches — no stalls, no misrouted replies, no need for the "pause and ask" or
+"drop and restart" contingencies the task prompt had prepared for. One writer subagent
+(`a63dddb0783096dd6`, for Omar Farouk) ran long enough that a status-check `SendMessage` was sent
+to it out of caution; the reply ("queued for delivery... at its next tool round") confirmed it was
+still actively working rather than stalled, and it completed normally shortly after — worth noting
+as the one moment that looked like it might become a friction point but resolved as ordinary
+latency, not a recurrence of the entries-31/33 bug or the entry-30 API-limit failure.
+
+On the actual content question: the fix worked for both personas. Helena Brandt, who previously
+answered "No" to Group D Q1 and only surfaced her held Associate-Foundations certification as a
+disclaimed Group A aside, this run answered Group D Q1 directly with "Yes, I do have something to
+share... I passed the Associate-Foundations certification." Omar Farouk, who previously answered
+"No, nothing like that" and declined to recount his already-named Developer-Foundations
+certification, this run answered "Yes, I have something to share... I passed the
+Developer-Foundations certification." Both writer subagents independently verified this was Group
+D Q1 *itself* carrying the signal, not just Group A repeating it — see
+`groundings/09-helena-brandt.md` and `groundings/10-omar-farouk.md`, both `verdict: "Surfaced"`,
+each with an explicit regression-check callout contrasting the new "Yes" against the old-wording
+"No" recorded in Finding 8. The prior (pre-widening) grounding files were archived to
+`groundings/09-helena-brandt-pre-group-d-widening.md` and
+`groundings/10-omar-farouk-pre-group-d-widening.md` rather than overwritten, preserving the
+before/after comparison as a durable artifact.
+
+**Why notable:** Two distinct confirmations bundled into one run. First, a genuinely new angle on
+the entries-31/33 mechanism bug — not just "don't delegate the orchestrator role to a sub-agent"
+(already established) but "does a session whose own root *is* a scheduled-trigger firing, with no
+prior interactive turns at all, behave the same way as an interactively-started session continuing
+unattended" — confirmed yes, by direct empirical test rather than by assuming the earlier fix
+generalizes. Second, a real (not synthetic) regression check on a shipped interview-design fix,
+run exactly as the originating Finding 8 entry requested ("not yet re-verified... the next full
+audit or repeat-test touching #9/#10 should confirm the widened wording actually resolves this"),
+with both personas independently confirming the same result rather than one persona's outcome
+being assumed to generalize to the other.
