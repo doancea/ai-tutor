@@ -248,8 +248,16 @@ corresponding spec (`INTERVIEW-DECISIONS.md`, "Group D, Q1") were both widened w
 example clause — "this includes a certification exam you've already passed, even without a
 detailed score report, not just a diagnostic or practice test" — so a held credential is
 unambiguously in scope for a "Yes" answer rather than relying on Group A/B to catch it
-incidentally. Not yet re-verified by a further grounding pass; the next full audit or repeat-test
-touching #9/#10 should confirm the widened wording actually resolves this.
+incidentally.
+
+**Re-verified.** Both personas were re-grounded under the widened wording (`groundings/09-helena-
+brandt.md`, `groundings/10-omar-farouk.md`, both `verdict: "Surfaced"`). Helena now answers Group D
+Q1 with a direct "Yes, I do have something to share... I passed the Associate-Foundations
+certification," replacing the prior run's "No" with the credential surfacing only as a disclaimed
+Group A aside. Omar now answers "Yes, I have something to share" and names the Developer-Foundations
+exam directly, replacing the prior run's flat "No, nothing like that." In both cases Group D now
+independently carries the held-credential signal rather than depending entirely on Group A having
+volunteered it — the format-axis gap this finding identified is closed.
 
 ### 9. Group E's unrecognized-source fallback had no grounding coverage — closed by a new coverage-gap persona
 
