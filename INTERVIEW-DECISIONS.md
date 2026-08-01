@@ -252,14 +252,15 @@ determine whether a viable diagnostic exists if they haven't, and it does not as
 how reliable an assessment they did take is. Both of those are agent-side behavior: sourcing
 triggered by a "no"-family answer, vetting triggered by a "yes" answer.
 
-- Q1 (**required**): Do you have results from an assessment related to this goal (or a similar
-  topic) that you're willing to share?
+- Q1 (**required**): Do you have results from any kind of assessment related to this goal (or a
+  similar topic) that you're willing to share — this includes a certification exam you've already
+  passed, even without a detailed score report, not just a diagnostic or practice test?
   - **Yes — I have results to share** → one combined free-text follow-up capturing both the
-    results (paste the raw output if still available, otherwise describe from memory) and the
-    source (what the assessment was, where it came from) — open text, since sources don't share a
-    common domain taxonomy or output format, consistent with the open-entry default. The reported
-    source feeds the agent-side skepticism-calibration policy (see "Group E — folded into Group
-    D," above).
+    results (paste the raw output if still available, otherwise describe from memory, a simple
+    pass/fail is fine if that's all there is) and the source (what the assessment was, where it
+    came from) — open text, since sources don't share a common domain taxonomy or output format,
+    consistent with the open-entry default. The reported source feeds the agent-side
+    skepticism-calibration policy (see "Group E — folded into Group D," above).
   - **No** → no further interview question; the agent takes over from here.
   - **No, but I'd be willing to take one** → no further interview question; captured as a
     willingness signal alongside the diagnostic-sourcing recommendation below. Whether (or how)
@@ -302,6 +303,20 @@ rather than a forced one. The third option separates "not interested/not applica
 taken one but would" — a distinction worth capturing even without a specified behavioral effect
 yet, consistent with everything else in this section being agent-side judgment rather than
 interview-specified logic.
+
+The "includes a certification exam you've already passed, even without a detailed score report"
+clause was added after re-grounding personas #9 (Helena Brandt) and #10 (Omar Farouk) under an
+earlier version of this wording that only said "an assessment... or a similar topic." Both
+personas already hold a prior-tier certification directly relevant to their stated goal — the
+exact case this broadening was meant to catch — but their answers diverged: Helena mentioned hers
+only as a disclaimed aside after answering "No," and Omar answered "No, nothing like that" outright
+and explicitly declined to recount the credential he'd already named earlier in the interview,
+reasoning that a pass/fail credential isn't "a formal test result." Neither treated a held
+certification as qualifying under "an assessment... you're willing to share" — evidently "an
+assessment" reads to people as a *scored diagnostic*, not a *pass/fail exam they already hold*,
+even with "a similar topic" attached. The explicit examples close that specific gap without
+reopening the self-report-rejection question above: the addition is about what counts as
+"results," not about asking anyone to judge their own reliability.
 
 **How to apply:** Q1 blocks nothing by itself, but its answer determines whether the generated
 plan is treated as final or provisional. A "No"-family answer with a viable external option found

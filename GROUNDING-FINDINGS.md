@@ -217,3 +217,32 @@ consistent, both explicitly noting the structural difference from the other case
 (The forward-looking implication for future mismatch-flagging logic is split out as Finding 6b,
 since that's an out-of-scope observation about a layer that doesn't exist yet, not a
 persona/methodology revision.)
+
+### 8. Group D's broadened wording reliably caught a *scored diagnostic* but not a *held prior-tier certification*, even under "or a similar topic"
+
+**Finding:** Finding 4's fix broadened Group D Q1 to "an assessment related to this goal or a
+similar topic" specifically so a related-but-not-identical prior result would register. Re-grounding
+under that wording surfaced a case it didn't anticipate: two personas who already hold a prior-tier
+Claude certification directly relevant to their stated goal (Helena Brandt, #9: holds
+Associate-Foundations, wants "the next level up"; Omar Farouk, #10: holds Developer-Foundations,
+wants deeper implementation depth) gave inconsistent, mostly negative answers to Group D despite
+both having volunteered the same credential unprompted in Group A. Helena answered "No" and only
+surfaced hers as a disclaimed aside; Omar answered "No, nothing like that" outright and declined to
+recount the credential he'd already named. Neither treated a held pass/fail certification as
+qualifying "results from an assessment" — the wording change generalized the *topic* axis
+("similar topic") but not the *format* axis (people read "assessment results" as scored-diagnostic
+output, not "a test I already passed").
+
+**Evidence:** `groundings/09-helena-brandt.md` and `groundings/10-omar-farouk.md`, both single-pass,
+both explicitly noting in their Comparison sections that Group D underperformed Group A on this
+specific signal. Contrast with `groundings/05-sam-okafor.md` and `groundings/22-camille-duarte.md`
+(2/2 consistent), both of which Group D *did* correctly capture — but both involve a scored
+diagnostic result, not a held certification, so they didn't exercise this failure mode.
+
+**Disposition:** Interview-design gap — actioned. Group D Q1 (`INTERVIEW-SCRIPT.md`) and its
+corresponding spec (`INTERVIEW-DECISIONS.md`, "Group D, Q1") were both widened with an explicit
+example clause — "this includes a certification exam you've already passed, even without a
+detailed score report, not just a diagnostic or practice test" — so a held credential is
+unambiguously in scope for a "Yes" answer rather than relying on Group A/B to catch it
+incidentally. Not yet re-verified by a further grounding pass; the next full audit or repeat-test
+touching #9/#10 should confirm the widened wording actually resolves this.
