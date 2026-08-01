@@ -93,13 +93,43 @@ Write to the now-free canonical paths: `groundings/09-helena-brandt.md`,
   failures (`CASE-STUDY-NOTES.md` entries 31, 33) — if anything about running this unattended
   surfaces a new friction point (a stall, an ambiguous judgment call, confirmation or
   disconfirmation that the fix actually holds), that's exactly the kind of thing worth capturing.
-- **Do not commit or push anything** — including `CASE-STUDY-NOTES.md`. Leave every change
-  (archived renames, new grounding files, and any case-study entry) unstaged for the user to review
-  when they're back — this repo's standing rule is to always show the diff before committing, and
-  there's no one here to review it right now.
+
+## Wrap-up: commit, open a PR, and merge — but only if the run actually completed
+
+**Safety gate first.** Only proceed with the steps below if both personas were fully interviewed
+and both writer files were produced with a real verdict (whether the fix worked or genuinely still
+didn't — either is a legitimate, mergeable result). If either interview stalled, a writer never
+returned, or you substituted a placeholder for missing data anywhere: stop here instead. Leave the
+working tree exactly as it is (uncommitted), write your final summary explaining what happened and
+what's missing, and do not create a branch, commit, PR, or merge. A stalled or partial run must
+never reach `main` unreviewed — that's not optional.
+
+If the run completed cleanly:
+
+1. Create a new branch: `git checkout -b reground-9-10-<today's date, YYYY-MM-DD>`.
+2. Commit in two separate commits, per this repo's standing convention (split unrelated changes
+   into separate commits; stage explicit file paths, never `git add -A` or `git add .`):
+   - Commit 1 — the grounding results: the two `git mv` archival renames plus the two new
+     `groundings/09-helena-brandt.md` / `groundings/10-omar-farouk.md` files.
+   - Commit 2 — the case-study entry, only if `CASE-STUDY-NOTES.md` actually changed above.
+   Match this repo's commit message style (check `git log` for recent examples): a short,
+   why-focused summary line, a body explaining what was tested and what the result was, ending
+   with a `Co-Authored-By:` trailer.
+3. Push the branch: `git push -u origin reground-9-10-<date>`.
+4. Open a PR: `gh pr create --title "..." --body "..."`. Put the headline result — whether Group D
+   Q1 actually fixed the issue this time, for both personas — plainly near the top of the body, not
+   buried.
+5. Before merging, run `gh auth status` and confirm it succeeds. If `gh` isn't authenticated, or
+   `gh pr merge` is rejected for any reason (branch protection, conflicts), do not try to route
+   around it — leave the PR open and say so clearly in your final summary. That's a fine outcome;
+   silently forcing a merge is not.
+6. Merge: `gh pr merge --merge` (a real merge commit, not squash — keep the two commits
+   distinguishable in history, matching how this repo's log otherwise reads).
 
 ## When done
 
 Write a concise final summary covering, for each persona: the verdict, and specifically whether
 Group D Q1 itself surfaced the credential this time (fixed) or not (still broken, and if so, your
-best read on why). Flag clearly if either interview stalled or you had to make a judgment call.
+best read on why). State plainly which outcome happened: merged to `main`, PR left open
+(auth/protection issue), or nothing committed at all (stalled/partial run) — don't make the reader
+dig for which one it was.
