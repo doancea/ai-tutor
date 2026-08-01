@@ -787,3 +787,40 @@ wearing a different name. Also a concrete illustration of a standing hazard with
 notifications: a `completed` status describes that the sub-agent's own turn ended, not that its
 assigned work finished — this one ended itself mid-task with an explicit "I'll pause and wait," and
 nothing ever resumed it afterward.
+
+## 34. Measured token cost of re-running the persona-grounding methodology correctly (direct orchestration, no delegation)
+
+**JSONL lines 810–1056** (2026-08-01T00:02–00:10Z, this session, immediately following entry 33's
+retry). Having established that the grounding-exercise orchestrator role can't be delegated, the
+assistant ran the re-grounding of personas #5, #9, #10, and #22 directly — spawning each persona
+subagent itself, asking each interview group via `SendMessage`, and dispatching one one-shot writer
+subagent per persona (two independent interview runs for Camille Duarte, per the repeat-testing
+rule). The user then asked for a token-cost accounting of that stretch of work, which the assistant
+built entirely from the `subagent_tokens` figures self-reported in each background-task
+notification's `<usage>` block:
+
+| Persona | Interview (5 turns) | Writer | Total |
+|---|---:|---:|---:|
+| Sam Okafor (#5) | 112,838 | 41,807 | 154,645 |
+| Helena Brandt (#9) | 112,340 | 39,319 | 151,659 |
+| Omar Farouk (#10) | 113,205 | 40,164 | 153,369 |
+| Camille Duarte (#22) — run 1 | 112,531 | — | — |
+| Camille Duarte (#22) — run 2 | 112,385 | — | — |
+| Camille Duarte (#22) — writer | — | 40,388 | — |
+| **Camille subtotal** | 224,916 | 40,388 | 265,304 |
+| **Round total** | | | **~724,977 tokens** |
+
+Each persona's interview cost climbed steadily turn over turn (e.g. Sam Okafor: 21,504 → 21,752 →
+22,628 → 23,222 → 23,732 across spawn, Group A, Group B+C, Group D, Group F) because each
+`SendMessage` resume reprocesses the full growing transcript as input — summing every turn (rather
+than just the final one) is the correct way to total the cost, since each turn is its own billed
+call over the whole context accumulated so far, not an incremental delta.
+
+**Why notable:** A concrete, verified cost figure for what "do the grounding methodology the way
+the docs actually prescribe" costs in practice — 9 background agents (5 persona interviews + 4
+writers) for 4 personas came to roughly 725K reported tokens, useful as a real data point for
+anyone estimating the cost of scaling this exercise to the full 22-persona set or beyond. Also
+notable for what it explicitly excludes: this total only covers the background subagents'
+self-reported figures, not the orchestrating session's own token usage for the `SendMessage`/`Agent`
+calls, file reads, and reasoning that drove them — a deliberately partial number, flagged as such
+rather than presented as the true total cost of the exercise.
