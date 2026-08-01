@@ -7,56 +7,173 @@ repeat_tested: false
 
 ## Transcript
 
-### Group A (role/background, years experience, industry, other Claude use, goals, target cert)
+### Group A
 
-"Sure, happy to walk through that.
+Q1 (role/background, years experience overall + with Claude, industry, anything else):
 
-1. I'm a team lead — non-technical side, I manage a team but I'm not writing code or anything like that.
+"Sure. I'm a team lead — I manage a small team, so my role is more about coordinating people and
+priorities than doing hands-on technical work myself. I've been working professionally for a
+little over twelve years now, most of it in some kind of management or coordination capacity. In
+terms of AI tools specifically, I'd say I'm moderately experienced with Claude — I use it fairly
+regularly through the chat interface for things like drafting communications, summarizing
+documents, helping me think through plans, that kind of thing. I don't use it through any
+developer tools or APIs — just the regular chat. I did go through the Associate-Foundations
+certification a while back, which helped me get more consistent and confident with it, but I
+wouldn't call myself technical by any means. As for industry — I work in-house, not consulting or
+agency. It's a fairly traditional corporate environment, cross-functional team, not a tech company
+per se. On how Claude fits into my work day to day — I mostly lean on it for writing support,
+condensing long threads or documents into something I can act on quickly, and occasionally
+bouncing ideas off it before a meeting. I don't ask it to do anything technical since that's not
+really my part of the job. That's about it for now."
 
-2. Professionally I've been working for a good while now — call it mid-career, over a decade. With Claude specifically, I've been using it regularly for a while now, moderate use, but it's all through the chat interface. I haven't touched the API or anything like that.
+Q2 (goals):
 
-3. I'd rather not get too specific about the industry, but it's a fairly standard corporate environment — nothing technical.
+"What I want out of this, concretely, is to come out the other side with the next credential up
+from Associate-Foundations, in that same non-technical track — something that signals I've gone
+deeper on working with Claude effectively, without requiring me to get into building or
+architecting anything. So the outcome isn't a role change or a deadline-driven thing, it's more
+about deepening my own capability as a practitioner — being someone on my team who can use Claude
+really well, guide others on how to use it well, maybe help shape how our team adopts it, without
+personally being the one who writes prompts into code or designs the underlying systems. So less
+'I need to hit X by Y date' and more 'I want a structured next step that builds on what I already
+have, ends in a recognized credential, and keeps me squarely in the non-technical lane.'"
 
-4. Beyond the regular chat use, not really — I use it for drafting, summarizing, that kind of thing, day to day work stuff. Nothing exotic.
+Q3 (target certification):
 
-As for what I want to get out of this — I already have the Associate-Foundations certification, so I've done the basics. I want to go to the next level up from that, still on the same track for people like me who aren't developers. I don't want to get into code or system design, that's not my world and not where I want to go. I just want to build on what I already know and get recognized for the next tier of that.
+"I don't know the exact, official name of it, if I'm honest. What I'm picturing is something like
+an 'advanced practitioner' level certification — the next rung up from Associate-Foundations, but
+still on that same non-technical, practitioner-facing track rather than veering off into anything
+developer-oriented. So not 'Associate' anymore, but not something like an architect or engineering
+certification either — the in-between step that says 'this person is genuinely skilled at using
+Claude well,' if that makes sense. If there's an official name for that tier, I'd trust you to
+match it up — I just know I want the next level, not a sideways move into something technical."
 
-As for a specific certification name — honestly, no, I'm not sure exactly what it's called. I just assumed there's some kind of "advanced" version of the practitioner track above Associate-Foundations, but I couldn't tell you the exact title. If you can tell me what it's actually called, that would help."
+### Group B
 
-### Group B + C combined (tool experience, prior structured learning, deadline framing, weekly time budget, distribution)
+Q (tool experience; prior structured learning):
 
-"Okay, sure.
+"Sure. Honestly, my hands-on experience is pretty much all through the chat interface — that's the
+only way I've ever used Claude. I haven't touched the API or SDK, and I've never used Claude Code
+or anything like that — that's really developer territory, not something I've had a reason to get
+into. I don't know much about MCP either, beyond having heard the term. Within chat, though, I'd
+say I've gotten fairly comfortable. I use it for drafting and editing emails and reports,
+summarizing long documents or meeting notes, brainstorming with it before presentations, that kind
+of thing. I've picked up some decent prompting habits along the way — giving it more context,
+asking it to take on a certain role or tone, iterating on a draft rather than expecting a perfect
+answer first try. Nothing formal, just stuff I've picked up from using it a lot and from the
+Associate-Foundations material. As for structured learning — the Associate-Foundations
+certification is really the only formal thing I've done, Claude-specific or otherwise. I haven't
+done any Anthropic Academy courses beyond whatever was bundled into that certification prep, and I
+haven't done any other vendor's AI certification — no AWS, no Gemini, nothing like that. No
+bootcamp either. It's really just been on-the-job, self-taught usage plus that one certification."
 
-On the hands-on side, it's really just chat — that's it. I use Claude.ai day to day, fairly regularly, for drafting emails, summarizing documents, that kind of thing. I haven't used the API, I haven't touched Claude Code, I don't know what MCP is honestly, and I wouldn't say I've done anything formal around prompt engineering — I just write to it the way you'd write to a person and adjust if it doesn't give me what I want.
+### Group C
 
-As for other structured learning — I did whatever was needed to get the Associate-Foundations certification, so I suppose that counts, but beyond that, no, I haven't done any Anthropic Academy courses or other vendor certifications or a bootcamp or anything like that. No formal diagnostic exam or anything for this next step either — I haven't tested myself, I just know I want to move up a level.
+Q (deadline framing; weekly time budget; distribution):
 
-There's no hard deadline on this, no employer mandate — nobody's telling me I need to do this by a certain date. It's really just self-paced, something I want to do for myself.
+"No hard deadline on this one — no exam booked, no employer mandate, nothing tied to a role
+change. It's entirely self-paced, driven by my own interest in getting to that next level rather
+than any outside pressure. In terms of hours, I'd say realistically 3 to 5 hours a week — so on
+the lower end of your 4–7 bracket, maybe. I have a full team-lead job to do, so this has to fit
+around that, not the other way around. As for how it shows up — it's pretty irregular, honestly.
+Some weeks I might get a solid stretch on a weekend if things are quiet, other weeks it's more
+like grabbing thirty or forty minutes here and there on weekday evenings. I wouldn't say it's
+reliably daily or reliably weekend-batched — it really depends on how the week goes."
 
-Time-wise, realistically I'd say 3 to 5 hours a week. That's probably the honest number given everything else going on. It's not going to be a consistent daily half hour or anything that tidy — it'll probably be a bit irregular, whenever I can carve out the time, maybe more on some days than others."
+### Group D
 
-### Group D (assessment results related to goal or similar topic)
+Q1 (widened wording): "Do you have results from any kind of assessment related to this goal (or a
+similar topic) that you're willing to share — this includes a certification exam you've already
+passed, even without a detailed score report, not just a diagnostic or practice test?"
 
-Q: "Do you have results from an assessment related to this goal (or a similar topic) that you're willing to share? If yes, share what you remember and where it was from."
+A: "Yes, I do have something to share, though it's not a detailed score report — I passed the
+Associate-Foundations certification, so that's a completed exam result, just not a granular
+breakdown of scores by section or anything like that. Beyond that, no, I haven't taken any other
+diagnostic or practice assessment — that certification is really the only formal result I have."
 
-"No, I don't have anything like that. I mentioned I haven't taken any formal diagnostic or assessment for this — the only thing on record is the Associate-Foundations certification itself, which I passed, but I don't have the actual score breakdown or report from that in front of me, and I never sat any other kind of skills assessment or test related to this. So I'm afraid I don't have anything concrete to share there."
+Follow-up (results + source):
 
-### Group F (plan format, modality, hands-on sizing)
+"It's pretty much just a pass/fail situation, if I'm being honest — I don't remember getting any
+kind of detailed score breakdown, just confirmation that I passed. It was the Associate-
+Foundations Claude certification, from Anthropic itself — that was the whole point of doing it, to
+get that official credential. I want to say I passed it comfortably, not right down to the wire,
+but I honestly don't remember the specific percentage or number of questions right or anything
+like that level of detail. Just that I completed it and passed."
 
-"For how it's presented — I'd really prefer a narrative, written guide. Something I can just read through, that walks me through things in a logical order, rather than a checklist I'm ticking boxes on or something too loose where I have to figure out the structure myself. I like having it laid out for me in a document I can follow.
+### Group F
 
-In terms of hands-on versus reading — I'd lean more toward reading and reference material, honestly. I'm not looking to build things or do hands-on projects — that's really not the kind of work I do day to day, and it's not what I'm after here. If there's some hands-on element that's unavoidable, I'd want it to be small and directly tied to things I'd actually do in my own work — like applying it to something real I'm already doing, not a standalone practice exercise or an open-ended tinkering thing. And if there is anything like that, I'd want it to be on the smaller side — quick, 15 to 30 minutes, not a big project. But really, my preference is for this to be mostly a written, narrative guide I can read and absorb."
+Q (plan format; modality):
+
+"For how it's presented, I'd much prefer a narrative document — something I can actually read
+through like a coherent plan, rather than a checklist or tracker I'm ticking boxes on. I find
+checklists a bit sterile for something like this; I'd rather understand the reasoning and flow of
+it as a story I can follow, if that makes sense. On the practice-versus-reading question — I'd
+lean more toward reading and reference material over hands-on building. Given that I'm staying in
+the non-technical lane, I don't imagine there's much 'building' for me to do in the way there
+would be for someone doing this to write code or set up systems. That said, I wouldn't want it to
+be purely passive either — if there's a sensible way to fold in some practical, applied practice
+using Claude through chat, things like working through realistic scenarios or exercises rather
+than technical exercises, I'd welcome that. So mostly reading and reference, with whatever
+hands-on practice makes sense for someone working strictly through chat."
+
+(Primary answer reads as "Reading/reference," so Q2a/Q2b were skipped, per script's "If
+Reading/reference → skip Q2a/Q2b entirely.")
 
 ## Comparison against ground truth
 
-**Ground truth:** "no such tier exists yet. Agent should recognize the gap and recommend either deepening Associate mastery or, if she's open to it, a realistic next step (e.g. Developer-Foundations) — not invent a nonexistent credential." (Background: already holds Associate-Foundations, wants "the next level up" in the same non-technical practitioner track, imagines an advanced-practitioner credential that isn't real, explicitly not interested in becoming a developer/architect.)
+**Ground truth:** "boundary case, 'Associate-Professional' (doesn't exist). Non-technical team
+lead, already holds Associate-Foundations, wants 'the next level up' in the same non-technical
+practitioner track — imagines an advanced-practitioner credential that isn't real. Explicitly not
+interested in becoming a developer/architect. Tool experience: chat-only, moderate. Deadline:
+self-paced. Budget: 3–5 hrs/wk. No diagnostic. Format: narrative. Agent should recognize the gap
+and recommend either deepening Associate mastery or, if she's open to it, a realistic next step
+(e.g. Developer-Foundations) — not invent a nonexistent credential."
 
-The core signal — an existing Associate-Foundations credential paired with a target that turns out not to exist — is surfaced clearly and unambiguously, but almost entirely by **Group A**, not by the Group D question this re-grounding is specifically probing.
+Per the standing scope note, this verdict is based only on whether the interview surfaced the
+necessary raw information — not on whether a downstream plan-generation agent would act on it
+correctly. Checking the three required elements:
 
-In Group A, Helena volunteers, unprompted and without hedging: "I already have the Associate-Foundations certification, so I've done the basics. I want to go to the next level up from that, still on the same track for people like me who aren't developers," and explicitly flags her own uncertainty about the target's real name: "I just assumed there's some kind of 'advanced' version of the practitioner track above Associate-Foundations, but I couldn't tell you the exact title." This is a clean, textbook presentation of exactly the raw material the ground truth calls for: an existing credential, a same-track "next level up" framing, and an explicit admission that she's guessing at a name she isn't sure exists. Group A also surfaces the conditioning fact for the *recommendation* half of the ground truth — "I don't want to get into code or system design, that's not my world and not where I want to go" — which bears on whether a Developer-Foundations redirect would actually fit her stated preference (a downstream-behavior question, noted here only as an aside per the scope note, not as part of the verdict).
+(a) **Already holds Associate-Foundations** — surfaced repeatedly and unambiguously: volunteered
+in Group A Q1 ("I did go through the Associate-Foundations certification a while back"), restated
+as the baseline in Group A Q2 ("the next credential up from Associate-Foundations"), and now also
+given as a direct affirmative in Group D Q1 ("Yes, I do have something to share... I passed the
+Associate-Foundations certification"), with source and pass/fail detail in the Group D follow-up.
 
-**On the specific Group D test:** the redesigned Q1 wording ("results from an assessment related to this goal, or a similar topic") did prompt Helena to re-mention the Associate-Foundations certification — but she frames her overall answer as a flat **no**, and only reintroduces the certification as a disclaimed aside: "No, I don't have anything like that... the only thing on record is the Associate-Foundations certification itself, which I passed, but I don't have the actual score breakdown or report from that in front of me... So I'm afraid I don't have anything concrete to share there." She does not treat holding and passing a certification as qualifying as "an assessment related to this goal" — in her framing, "assessment results" means a score report or diagnostic breakdown, and a pass/fail credential without that detail doesn't count as something to "share." So Group D, taken in isolation, carries the signal only weakly and awkwardly: the fact is present in the raw text, but it rides in on the back of a declined/negative answer rather than being volunteered as a direct "yes." Compared to the old, narrower Group D wording — which per the audit never routed this kind of signal through Group D at all — this is an improvement (the certification is at least mentioned under Q1 now), but it is not a full fix: a future reader who weighted Group D answers primarily by their literal yes/no framing could still undercount this signal, whereas a reader taking the transcript as a whole cannot miss it, since Group A already stated it plainly minutes earlier.
+(b) **Named target tier doesn't correspond to a real credential** — surfaced clearly in Group A
+Q3: she explicitly says she doesn't know the official name, describes an invented in-between tier
+("'advanced practitioner' level... not 'Associate' anymore, but not something like an architect or
+engineering certification either"), and explicitly asks the agent to "match it up" if a real name
+exists — leaving the gap-recognition task legibly on the table rather than asserting a specific
+(wrong) name as fact.
+
+(c) **Open to alternatives if a realistic next step exists** — surfaced in Group A Q2 and Q3: her
+stated outcome is framed around progression and structure ("a structured next step that builds on
+what I already have, ends in a recognized credential") rather than insistence on one specific
+title, and she defers to the agent's judgment ("I'd trust you to match it up") rather than
+rejecting substitutes outright. The one firm constraint she repeats is staying in the non-technical
+lane, which is itself clearly stated (Group A Q2: "without personally being the one who writes
+prompts into code or designs the underlying systems"; Group B: developer tooling and Claude Code
+are explicitly disclaimed as "developer territory, not something I've had a reason to get into").
+
+**Mandatory Group D Q1 regression-check callout:** Under the *previous* wording ("an assessment
+related to this goal or a similar topic"), Finding 8 documented Helena answering "No" to Group D
+and only surfacing the Associate-Foundations certification as a disclaimed aside back in Group A
+("I don't have a formal diagnostic to share, though I suppose my Associate-Foundations cert sort of
+counts, if that's relevant"-type framing) — i.e., the certification never registered as a direct
+"yes" to the Group D question itself, only as an incidental mention elsewhere. Under the *widened*
+wording tested in this run, Group D Q1 produced a direct, unambiguous "Yes, I do have something to
+share... I passed the Associate-Foundations certification" — the certification is now surfaced as
+the explicit answer to the assessment question, not merely inferable from an earlier aside. The
+widened wording's explicit carve-out ("this includes a certification exam you've already passed,
+even without a detailed score report, not just a diagnostic or practice test") appears to have
+directly resolved the prior failure: Helena no longer has to judge on her own whether a pass/fail
+certification result "counts" as an assessment — the question now tells her it does, and she
+answers accordingly.
 
 ## Verdict
 
-**Surfaced.** The raw information a plan-generation agent would need — that Helena already holds Associate-Foundations, wants a same-track "next tier" that she isn't sure is real, and isn't interested in a developer/architect redirect — is stated clearly and directly in Group A, leaving no ambiguity in the transcript as a whole. The Group D redesign under test only partially closes the coverage gap it was meant to close: it did surface the existing credential again, but folded inside a "no" answer rather than as an affirmative hit, so its contribution here is reinforcing rather than load-bearing. Worth flagging for Step 3: Group D's new wording may need a nudge (e.g., "including a certification you passed, even without a detailed score report") if the goal is for this signal to route through Group D reliably on its own, independent of whatever Group A happens to volunteer.
+**Surfaced.** All three required elements — the held Associate-Foundations credential, the
+non-existence of her named target tier, and her openness to a realistic alternative — are clearly
+present in the transcript, and the specific regression this run was testing is resolved: Group D
+Q1 now elicits a direct "Yes" naming the Associate-Foundations certification, rather than the prior
+run's "No" with the credential surfacing only as a disclaimed aside back in Group A.
