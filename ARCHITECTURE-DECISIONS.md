@@ -12,6 +12,12 @@ chronological.
 - **Certification scope for v1** — which tracks are actually in scope now vs. later.
 - **Agent invocation timing** — synchronous (interview submit blocks until a plan is ready) vs.
   async (kick off generation, notify when done).
+- **Supplemental-material persistence and flow** — the new post-interview freeform step (see
+  `INTERVIEW-DECISIONS.md`, "Post-interview supplemental step") needs the same kind of flow
+  decision this doc already made for structured interview answers: does it follow the "never
+  persisted, in-memory for the round-trip only" rule above, or does it need different handling
+  since it's less structured and potentially reused across later agent invocations (diagnostic
+  revision, reassessment)? Not yet decided.
 
 ## Interview → agent → tracker integration, high level
 

@@ -324,3 +324,26 @@ should produce a plan explicitly marked pending that result, not a plan that qui
 if no diagnostic data will ever exist. A "Yes" answer's combined result+source text feeds two
 separate agent-side steps: the Group E skepticism-calibration policy (how much to trust the
 number) and relevance judgment (how much the assessed topic overlaps the current goal).
+
+## Post-interview supplemental step — freeform ad-hoc material
+
+**Decision:** After the structured interview (Groups A–F), the interviewee gets one open freeform
+box to add anything not covered by the script — notes, a job description, prior context, anything
+else they want the agent to see. This is a new, additional feature in the node app, not another
+question in the Groups A–F sequence: it isn't required/optional-structured like those, it isn't
+branched, and it isn't scored. Content entered here is passed to the agent as unstructured
+supplemental material, kept distinct from the structured Group A–F answers rather than merged
+into them.
+
+**Why:** Not yet elaborated beyond the shape decision itself — this entry captures that the step
+exists and its freeform-not-structured form, ahead of a fuller design pass. Recorded now so the
+step isn't lost or reinvented differently later.
+
+**How to apply:** Treat this as a placeholder for a real design pass, not a finished spec. Open,
+not yet decided: where this step sits in the flow (end of Group F vs. a separate screen), whether
+it's required or skippable, how (or whether) it's persisted given the existing "interview answers
+are never persisted" decision in `ARCHITECTURE-DECISIONS.md`, how the agent is instructed to weigh
+freeform supplemental material against the structured answers, and the literal prompt copy for
+`INTERVIEW-SCRIPT.md`. A dedicated grounding pass (like the Groups A–F personas exercise) is
+planned for this step once its shape is fuller — see `GROUNDING-DECISIONS.md` for that
+methodology.
