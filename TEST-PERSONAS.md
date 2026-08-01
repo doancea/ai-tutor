@@ -1,6 +1,6 @@
 # TEST-PERSONAS.md
 
-22 synthetic test personas used to stress-test the onboarding interview design
+23 synthetic test personas used to stress-test the onboarding interview design
 (`INTERVIEW-DECISIONS.md`) and, later, the agent's plan-generation behavior — the same role
 `DECISIONS.md`'s one real diagnostic result played for the original single-user build, just
 scaled to cover intersections we don't have a real person for. Each persona is instantiated as
@@ -9,12 +9,13 @@ session. This doc is the roster and the answer key; the **Ground truth** line un
 is for our own evaluation only — it is never given to the persona subagent itself, since a real
 interviewee wouldn't know the "correct" cert-fit judgment about themselves.
 
-19 of the 22 are edge/boundary cases: hard to catch (a signal may be buried or easy to
-under/over-state) but with a discoverable correct answer once the right detail is caught. The
-last 3 are **margin personas** — a distinct category, deliberately built with no dominant signal
-either way, testing whether the interview/policy reaches a stable, reasoned call in a genuine
-50/50 rather than an arbitrary tie-break. See `PERSONA-DECISIONS.md` for the rationale behind
-that distinction.
+19 of the 23 are edge/boundary cases: hard to catch (a signal may be buried or easy to
+under/over-state) but with a discoverable correct answer once the right detail is caught. 3 are
+**margin personas** — a distinct category, deliberately built with no dominant signal either way,
+testing whether the interview/policy reaches a stable, reasoned call in a genuine 50/50 rather than
+an arbitrary tie-break. The last, #23, is a **coverage-gap persona** added after the original 22 to
+exercise a policy branch none of the others reached. See `PERSONA-DECISIONS.md` for the rationale
+behind these distinctions.
 
 Matrix: of the four current Anthropic certs, only Architect has both Foundations and Professional
 tiers today; Associate and Developer are Foundations-only. Personas #9–10 deliberately target the
@@ -241,3 +242,28 @@ the agent-side skepticism-calibration policy as the known, long-form tier — th
 whether a high-item, known-reliable instrument gets comparatively less downweighting than the
 default (contrast Sam Okafor, #5, same known source but the short-form tier). This is orthogonal
 to the score-margin ambiguity above, not a second margin dimension.
+
+## Coverage-gap personas (1)
+
+Added after the original 22, once a relevance check on the Group E skepticism-calibration policy
+found that every persona exercising it used the one known, vetted source
+(`claudecertificationguide.com`) — the policy's "unrecognized source falls back to full
+flat-skepticism" branch had no grounding coverage at all. See `PERSONA-DECISIONS.md` for the
+rationale behind adding a persona after the fact rather than folding this into an existing one.
+
+### 23. Kwame Boateng — diagnostic result from an unrecognized/unvetted source
+Platform engineer, ~6 years experience, moderate Claude Code use. Targets Architect-Foundations —
+same cert as Sam Okafor (#5), deliberately, so the only variable that differs between the two is
+the source axis, not the score shape. Prior diagnostic: a practice-question set a former coworker
+put together informally in a shared doc after taking the real exam themselves — no institutional
+backing, no published methodology, no item-count or reliability data. Passed comfortably but
+unevenly across the handful of topics it covered — the same "good, uneven score" shape as Sam's
+case.
+**Ground truth:** Group D Q1's follow-up should elicit a specific, nameable source that's clearly
+not `claudecertificationguide.com` (or any other known-vetted instrument) — enough detail for the
+agent-side vetting step to recognize it as unrecognized and fall back to the full flat-skepticism
+default, rather than either (a) failing to capture source detail at all, the way Elena Petrova's
+grounding (#13) incidentally did without ever being tested for it, or (b) surfacing just enough
+informal credibility-signaling ("a coworker who actually passed made it") that a future agent might
+be tempted to extend it the partial calibrated relief the current policy reserves for one specific
+vetted source only.

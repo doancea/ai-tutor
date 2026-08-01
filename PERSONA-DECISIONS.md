@@ -139,3 +139,26 @@ ambiguity even with full information) — these test different things and should
 Margin personas are, by construction, primary candidates for the repeat-interview treatment in
 `GROUNDING-DECISIONS.md`, since there's no "correct" outcome to converge on — the goal is a stable
 call, not the right one.
+
+## Coverage-gap personas: a fifth category, added reactively rather than up front
+
+**Decision:** Persona #23 (Kwame Boateng) was added after the original 22 were designed and
+grounded, as a new **coverage-gap** category distinct from solid-fit/edge/boundary/margin.
+
+**Why:** A relevance check on the Group E skepticism-calibration policy (prompted from outside the
+original grounding plan, not discovered by it) found that every persona exercising that policy —
+Sam Okafor (#5), Camille Duarte (#22) — used the one known, vetted source
+(`claudecertificationguide.com`), at its two documented tiers. The policy's third branch —
+an unrecognized/unverifiable source falling back to the full flat-skepticism default — had no
+persona exercising it at all. This is a different origin story from the other four categories,
+which were all designed into the roster from the start (`TEST-PERSONAS.md`'s original 19,
+then the 3 margin personas). A coverage-gap persona instead exists because auditing the *policy*
+itself, not the persona matrix, surfaced a branch nothing was testing — the same kind of gap
+Camille Duarte (#22) closed for the long-form-tier branch, but arrived at through explicit
+after-the-fact review rather than caught during the original design pass.
+
+**How to apply:** When a future policy-relevance check (or any other audit of what's actually
+locked into `INTERVIEW-DECISIONS.md`) finds a branch no persona exercises, add a coverage-gap
+persona rather than forcing the gap into an existing category it doesn't actually fit — solid-fit/
+edge/boundary/margin all describe *how discoverable the signal is*, not *whether the roster
+happens to cover the branch at all*, which is what this category tracks instead.

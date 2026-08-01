@@ -19,6 +19,10 @@ This is itself the headline result: across 7 extraction-dependent edge/cross-cut
 persona-generation noise, the interview script's signal extraction held up on every single repeat
 test. No interview-design fragility was detected via the repeat-interview mechanism.
 
+A 23rd persona (#23, Kwame Boateng) was added after this synthesis pass, once a later relevance
+check on the Group E policy found a branch none of the original 22 exercised — see Finding 9. It
+also resolved **Surfaced**, single-pass.
+
 ## Findings
 
 ### 1. Interview design showed no fragility across any repeat-tested persona
@@ -246,3 +250,27 @@ detailed score report, not just a diagnostic or practice test" — so a held cre
 unambiguously in scope for a "Yes" answer rather than relying on Group A/B to catch it
 incidentally. Not yet re-verified by a further grounding pass; the next full audit or repeat-test
 touching #9/#10 should confirm the widened wording actually resolves this.
+
+### 9. Group E's unrecognized-source fallback had no grounding coverage — closed by a new coverage-gap persona
+
+**Finding:** A relevance check on the Group E skepticism-calibration policy (`INTERVIEW-DECISIONS.md`)
+found that both personas exercising it — Sam Okafor (#5) and Camille Duarte (#22) — report a result
+from the one known, vetted source (`claudecertificationguide.com`), at its two documented tiers. The
+policy's third branch, where an unrecognized/unverifiable source falls back to the full
+flat-skepticism default, had never been exercised by any persona. Elena Petrova (#13) came closest
+by accident — her Group D answer never names a source at all — but her ground truth was never
+scoped to that axis, so the gap went unchecked rather than confirmed either way.
+
+**Evidence:** `groundings/05-sam-okafor.md` and `groundings/22-camille-duarte.md`, both naming
+`claudecertificationguide.com` explicitly; `groundings/13-elena-petrova.md`, whose Group D answer
+never surfaces a source at all.
+
+**Disposition:** Persona/methodology artifact — actioned. Added persona #23 (Kwame Boateng) as a
+new **coverage-gap** category in `TEST-PERSONAS.md` / `PERSONA-DECISIONS.md`, reusing Sam Okafor's
+cert placement (Architect-Foundations) and score shape (good, uneven) so the source axis is the only
+variable that differs. Grounded in `groundings/23-kwame-boateng.md`: Group D Q1's follow-up produced
+a specific, nameable, explicitly non-official source (a former coworker's informally recollected
+practice-question set) with rich disqualifying detail — no institutional backing, no methodology, no
+published reliability, no clean score — verdict **Surfaced**. Closes the coverage gap; no change to
+`INTERVIEW-SCRIPT.md` or the Group E policy text itself was needed, since the interview already asks
+for source detail (Group D Q1) and elicited it cleanly here.
