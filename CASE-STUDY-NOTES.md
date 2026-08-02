@@ -931,3 +931,73 @@ step the plan itself had specified. The `git mv` did in fact carry the untracked
 cleanly (verified after the fact), so the scratchpad copy turned out to be belt-and-suspenders
 rather than load-bearing — but the plan's Step 0, taken at face value, would have provided false
 confidence that the real data was backed up when the branch alone did not accomplish that.
+
+## 37. API-key setup and first live run surfaced two independently-caught bugs and a live concurrent-session collision — none of them assumed away
+
+**Source: this session** (2026-08-02). Directly following entry 36's first implementation session,
+this was the app's first live run with a real API key. The task looked mechanical (set an env var,
+run the app) but produced several moments where the correct move was to verify rather than trust
+that a stated fix or stated instruction had actually taken effect.
+
+**A proposed approach was simplified twice through back-and-forth, ending in a zero-code-change
+outcome.** The assistant's first offer was a project-local `ai-tutor/.env` file (gitignored, per
+`.gitignore:5`). The user instead wanted a system-wide shell variable for reuse across other
+projects, and named it `PERSONAL_ANTHROPIC_KEY` — the assistant edited `server/agent.js:3` from
+`new Anthropic()` to `new Anthropic({ apiKey: process.env.PERSONAL_ANTHROPIC_KEY })` to match. The
+user then renamed the shell variable itself to `ANTHROPIC_API_KEY`, matching the Anthropic SDK's
+own default lookup, which made the code edit unnecessary — the assistant reverted `agent.js` back
+to plain `new Anthropic()`. Net application-code diff after two rounds of back-and-forth: zero. The
+simplification came from the user changing the *variable name* rather than the assistant changing
+the *code* — the smaller lever won.
+
+**A stated fix was verified, not assumed, and a real typo turned up.** The user's instruction —
+"source ~/.zshenv to get it loaded" — implied the key would then be available. Sourcing the file
+and echoing the variable first came back empty; grepping the file directly found the actual bug:
+`export ANTHROPICi_API_KEY=...` (an extra `i`), not the variable name the SDK reads. Fixed and
+re-verified (108-char value now present) before reporting success rather than after. A direct
+instance of the "verify before propagating" discipline this repo's `CLAUDE.md` names as a standing
+rule (citing entry 4) — here applied to a live config claim rather than a case-study writeup.
+
+**Invoking the `run` skill hit a live concurrent-session collision.** A file path
+(`ai-tutor/server/agent.js`) that had resolved fine minutes earlier in the same conversation
+suddenly failed to read — another session had renamed the project directory (`ai-tutor/` →
+`app/`, commit `009c642` "Rename to app") and left an uncommitted lockfile tweak (`ccarf-client` →
+`ai-tutor-client` in `app/client/package-lock.json`) mid-work. Concrete, live evidence for the
+exact scenario both `CLAUDE.md` files flag as a standing hazard ("parallel sessions are often
+writing to this repo concurrently") rather than a hypothetical one — resolved by reading `git log`
+and the diff before touching anything, confirming a benign rename-in-progress rather than
+something to treat as a conflict.
+
+**Two "presence isn't proof" checks caught what would otherwise have been assumed.** First: rather
+than launching a fresh `npm run dev` per the `run` skill's default pattern, `lsof` turned up an
+already-running dev server (PID 7001) with a live, connected browser tab. Reusing it required
+confirming it actually had the *corrected* environment, since env vars load only at process start —
+comparing the process's `lstart` (15:35:51) against `~/.zshenv`'s mtime (15:30:18) suggested the
+timing was right, but the assistant then confirmed directly via `ps eww 7001` that the live
+process's actual environment held the fixed key, rather than trusting the timing comparison alone.
+Second: the presence of `data/ccarf.json` alone doesn't prove the interview's plan-generation call
+succeeded — `SEED_DEMO=true` seeds the same file with hand-authored content and no API call at all.
+Confirmed by diffing a distinguishing phase title against the hard-coded content in `seed.js`
+("Phase 0 — Foundations" there vs. the live file's agent-generated "Phase 0 — Orientation: the
+exam, the products, and your practice setup"), plus checking `onboarded: true` and realistic
+task/quiz counts (47 tasks, 27 quiz questions) that the hand-authored seed wouldn't produce.
+
+**A tooling limit surfaced and was disclosed rather than papered over.** The Claude-in-Chrome
+extension was unavailable when the assistant tried to visually drive the already-open tab
+(`tabs_context_mcp` returned "Browser extension is not connected"). Rather than reporting the run
+as fully browser-verified, the assistant fell back to `curl`-based verification against both the
+server directly and through the Vite dev proxy, and told the user explicitly that visual
+confirmation hadn't happened and the open tab should be checked by eye. A concrete instance of a
+skill/tool being nominally available but not actually connected at call-time — a future reader
+relying on browser automation for verification should have a non-visual fallback ready rather than
+assuming the extension will be live.
+
+**Why notable:** Every moment above had a "looks fine, could have been assumed" shortcut available
+— trust the user's stated fix, trust the skill's default launch pattern, trust that a data file's
+existence means the pipeline worked, trust that the browser tool would connect — and each was
+checked empirically instead, turning up one real bug (the zshenv typo) and one real environmental
+hazard (a concurrent rename) that a trust-first pass would have missed or mishandled. None of these
+checks were prompted by the user asking "are you sure?" — each ran before reporting status, which
+is the same pattern this repo's grounding-methodology entries (e.g. 33, 35) already established for
+sub-agent orchestration, shown here extending naturally to ordinary environment and tooling
+verification too.
