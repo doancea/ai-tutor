@@ -877,3 +877,57 @@ run exactly as the originating Finding 8 entry requested ("not yet re-verified..
 audit or repeat-test touching #9/#10 should confirm the widened wording actually resolves this"),
 with both personas independently confirming the same result rather than one persona's outcome
 being assumed to generalize to the other.
+
+## 36. First implementation session after the design-only phase — a scope redirect, three mid-plan additions layered onto plan mode, and a gitignored-data near-miss caught before it mattered
+
+**Source: this session.** This was the first session in the project's history to write and ship
+application code, after roughly five weeks of design-only work (interview design, grounding,
+persona methodology). Two things about the transition are worth recording.
+
+**The user redirected scope mid-conversation, not just mid-task.** The session opened by
+resolving the "next step" as design work on the post-interview freeform supplemental-material
+step (flagged as a placeholder decision in `f707c4e`). The assistant drafted concrete answers to
+all four of that step's open questions (flow placement, required/skippable, persistence, agent
+weighting) and asked where to push back. The user's actual response: "let's hold off on the
+freeform content flow until we've completed tying the initial interview into the existing web
+app" — a correction not to any individual answer, but to the choice of *which* open item to work
+on next. The freeform-step answers were discarded rather than written anywhere; the session
+pivoted entirely to scoping and then building the interview-to-tracker pipeline instead. Worth
+noting for how "what's the next step" questions get answered in this repo: the standing docs
+record open items, but which one is actually next is a judgment call the user reserves, not
+something to infer from doc ordering or apparent urgency.
+
+**Plan mode absorbed three scope additions after the plan was already written, each via
+`ExitPlanMode` rejection with actionable feedback rather than a flat "no."** The first
+`ExitPlanMode` call (a fully-scoped plan for the interview-to-agent-to-tracker pipeline, arrived
+at after two rounds of `AskUserQuestion` resolving cert-scope, invocation-timing, and — once a
+real in-progress `data/ccarf.json` was discovered mid-exploration — the existing-data/seed.js-fate
+questions) was rejected with: "One shift. Let's create a backup branch of the current state before
+kicking this plan off. Then kick it off and use auto mode." The plan was amended with a Step 0
+(backup branch) and re-submitted. The second rejection added a second amendment: "let's rename the
+app from ccarf-app to ai-tutor to match the project" — a directory/package/branding rename folded
+in as Step 0.5, scoped narrowly (mechanical references only, explicitly leaving historical prose
+in `CLAUDE.md`/`CASE-STUDY-NOTES.md` untouched) before the third `ExitPlanMode` call finally
+landed. Each rejection message was a real instruction to fold into the plan, not a request to
+start over — the plan-mode file (`swirling-munching-lampson.md`) accumulated three edits across
+two rejections before approval, all read-only-safe since only the plan file itself is editable
+inside plan mode.
+
+**A gitignored, uncommitted, real production data file almost fell outside the safety net.** The
+approved plan's Step 0 was "create a backup branch... so today's state — including the real
+`data/ccarf.json` — is recoverable." Executing it surfaced that `data/ccarf.json` is listed in
+`.gitignore` (`ccarf-app/.gitignore:4`, now `ai-tutor/.gitignore`) and was never tracked —
+confirmed via `git ls-files ccarf-app/data/` returning empty. A git backup branch protects
+committed state only; it would have done nothing for this file. The actual risk was concrete:
+the very next step in the same plan was `git mv ccarf-app ai-tutor`, a directory rename that (per
+the interactive checklist "before any command that could discard uncommitted work... run `git
+status` first") is exactly the kind of operation that warrants checking what's actually at stake
+before running it — an untracked file physically inside a directory being renamed rides along
+with a plain filesystem rename, but there was no verification of that rather than assuming it.
+The fix was a separate filesystem copy of `data/ccarf.json` to the session scratchpad *before* the
+`git mv`, independent of git entirely — caught during execution by pausing to ask "does the backup
+branch I was just asked to create actually cover the thing it's meant to protect," not by any
+step the plan itself had specified. The `git mv` did in fact carry the untracked file across
+cleanly (verified after the fact), so the scratchpad copy turned out to be belt-and-suspenders
+rather than load-bearing — but the plan's Step 0, taken at face value, would have provided false
+confidence that the real data was backed up when the branch alone did not accomplish that.
