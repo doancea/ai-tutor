@@ -6,18 +6,40 @@ import Phase from './pages/Phase.jsx';
 import TimeLog from './pages/TimeLog.jsx';
 import Diagnostics from './pages/Diagnostics.jsx';
 import Resources from './pages/Resources.jsx';
+import Interview from './pages/Interview.jsx';
 import { api } from './api.js';
 
 export default function App() {
   const [phases, setPhases] = useState(null);
+  const [onboarded, setOnboarded] = useState(null);
 
   const reload = useCallback(() => {
     api.getPhases().then(setPhases).catch(console.error);
   }, []);
 
   useEffect(() => {
-    reload();
-  }, [reload]);
+    api
+      .getOnboardingStatus()
+      .then((s) => setOnboarded(s.onboarded))
+      .catch(() => setOnboarded(true)); // fail open to the normal app rather than trapping on a status error
+  }, []);
+
+  useEffect(() => {
+    if (onboarded) reload();
+  }, [onboarded, reload]);
+
+  if (onboarded === null) {
+    return <div className="loading">Loading…</div>;
+  }
+
+  if (!onboarded) {
+    return (
+      <div className="app-shell">
+        <div className="grid-bg" />
+        <Interview onComplete={() => setOnboarded(true)} />
+      </div>
+    );
+  }
 
   return (
     <div className="app-shell">

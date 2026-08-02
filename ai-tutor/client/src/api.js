@@ -11,6 +11,10 @@ async function handle(res) {
 const jsonHeaders = { 'Content-Type': 'application/json' };
 
 export const api = {
+  getOnboardingStatus: () => fetch(`${BASE}/onboarding`).then(handle),
+  submitInterview: (answers) =>
+    fetch(`${BASE}/interview`, { method: 'POST', headers: jsonHeaders, body: JSON.stringify(answers) }).then(handle),
+
   getPhases: () => fetch(`${BASE}/phases`).then(handle),
 
   toggleTask: (id, done) =>

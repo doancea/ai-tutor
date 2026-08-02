@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -7,6 +9,7 @@ const phasesRouter = require('./routes/phases');
 const progressRouter = require('./routes/progress');
 const timeRouter = require('./routes/time');
 const diagnosticsRouter = require('./routes/diagnostics');
+const interviewRouter = require('./routes/interview');
 
 const app = express();
 const PORT = process.env.PORT || 3131;
@@ -22,6 +25,7 @@ app.use('/api/phases', phasesRouter);
 app.use('/api', progressRouter);
 app.use('/api/time-entries', timeRouter);
 app.use('/api/diagnostics', diagnosticsRouter);
+app.use('/api', interviewRouter);
 
 // Serve the built client if it exists (i.e. after `npm run build`)
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
@@ -40,5 +44,5 @@ if (fs.existsSync(clientDist)) {
 }
 
 app.listen(PORT, () => {
-  console.log(`\nCCAR-F app running at http://localhost:${PORT}\n`);
+  console.log(`\nAI Tutor running at http://localhost:${PORT}\n`);
 });

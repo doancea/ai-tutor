@@ -605,6 +605,133 @@ select {
   font-size: 11px;
 }
 
+/* ---------- Onboarding interview ---------- */
+
+.interview-shell {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 24px;
+}
+.interview-card {
+  width: 100%;
+  max-width: 680px;
+  border: 1px solid #3b5a75;
+  background: rgba(10, 26, 46, 0.6);
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.interview-card h1 {
+  font-size: 22px;
+  margin: 4px 0 0;
+}
+.interview-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.interview-progress-step {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  color: #5c7a99;
+  border: 1px solid #3b5a75;
+  padding: 4px 8px;
+}
+.interview-progress-step.active {
+  color: #e8a33d;
+  border-color: #e8a33d;
+}
+.interview-progress-step.done {
+  color: #7fb3d5;
+}
+.interview-field {
+  margin-bottom: 14px;
+}
+.interview-field-label {
+  font-size: 13px;
+  color: #b7c9da;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.required-mark {
+  color: #c1503f;
+}
+.interview-input,
+.interview-textarea {
+  width: 100%;
+  background: #0a1a2e;
+  border: 1px solid #3b5a75;
+  color: #edeff2;
+  padding: 9px 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13.5px;
+  resize: vertical;
+}
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.option-btn {
+  text-align: left;
+  background: #0a1a2e;
+  border: 1px solid #3b5a75;
+  color: #dce4eb;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.option-btn:hover {
+  border-color: #7fb3d5;
+}
+.option-btn.selected {
+  border-color: #e8a33d;
+  background: rgba(232, 163, 61, 0.12);
+  color: #e8a33d;
+}
+.option-other-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.option-other-row .option-btn {
+  flex-shrink: 0;
+}
+.interview-nav-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+.interview-review-text {
+  color: #8fa8bf;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.interview-loading {
+  font-family: 'JetBrains Mono', monospace;
+  color: #e8a33d;
+  font-size: 13px;
+  padding: 10px 0;
+}
+.interview-error {
+  color: #e8b0a9;
+  font-size: 13px;
+}
+.agent-notes {
+  color: #dce4eb;
+  font-size: 14px;
+  line-height: 1.6;
+  border-left: 2px solid #e8a33d;
+  padding-left: 12px;
+}
+
 @media (max-width: 900px) {
   .sidebar {
     display: none;
