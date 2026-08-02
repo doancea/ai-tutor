@@ -9,9 +9,6 @@ chronological.
 
 ## Parking lot — open topics not yet discussed
 
-- **Certification scope for v1** — which tracks are actually in scope now vs. later.
-- **Agent invocation timing** — synchronous (interview submit blocks until a plan is ready) vs.
-  async (kick off generation, notify when done).
 - **Supplemental-material persistence and flow** — the new post-interview freeform step (see
   `INTERVIEW-DECISIONS.md`, "Post-interview supplemental step") needs the same kind of flow
   decision this doc already made for structured interview answers: does it follow the "never
@@ -103,3 +100,56 @@ would have cascaded into schema and privacy decisions made by default rather tha
 v1 and shouldn't shape schema decisions going forward — schema work should assume exactly one
 user's data per running instance. Revisit the struck-through multi-user paragraph above only if
 scope explicitly expands beyond single-user/self-hosted later.
+
+## Certification scope for v1 — open-ended, not a fixed track list
+
+**Decision:** The agent is not restricted to a hand-encoded list of supported certification
+tracks. Group A Q3 already takes a free-text target certification with no fixed enum
+(`INTERVIEW-DECISIONS.md`); the agent-side behavior generalizes that openness rather than
+constraining it — for whatever track is named (or recommended from Q1+Q2 when none is), the
+agent uses the Claude API's server-side web search tool at generation time to find the track's
+domain weights, exam structure, and any credible third-party diagnostics, the same way
+`DECISIONS.md`'s "Where domain weights and hour estimates came from" describes doing by hand for
+the one original case (CCAR-F/Architect-Foundations).
+
+**Why:** A fixed short list (encode Architect-Foundations, Developer-Foundations,
+Associate-Foundations by hand, like `seed.js` does today for one track) would cap the generalized
+app at the same single-cert scope the original app had, just renamed — directly contradicting the
+point of generalizing it. The interview was already designed around an agent that reasons over
+prose rather than a rules engine matched against a fixed taxonomy (`INTERVIEW-DECISIONS.md`,
+"Consumer of these answers is an AI agent, not a rules engine"); hand-coding a cert allowlist
+would reintroduce exactly that kind of rigid taxonomy at the generation layer, one level down from
+where the interview design already rejected it. Research quality is unverified by a human up
+front for any track beyond the original CCAR-F case — accepted as the tradeoff for not artificially
+limiting scope, and consistent with Group E's whole premise that the agent, not a human, is
+responsible for vetting the reliability of anything it finds.
+
+**How to apply:** The plan-generation agent call includes the `web_search_20260209` server-side
+tool (Claude Opus 5, per the `claude-api` skill's current defaults) so it can research an
+unfamiliar track's domain weights and exam structure rather than inventing them. This is a
+capability requirement on the agent call itself, not a new interview question or a new persisted
+config list — no `certifications` collection needs to exist in the data model for this. Group D's
+existing skepticism-calibration policy (`INTERVIEW-DECISIONS.md`, "Group E — folded into Group D")
+already gives the agent a framework for treating a newly-discovered diagnostic source with
+appropriate caution, and generalizes cleanly to newly-discovered domain-weight sources too.
+
+## Agent invocation timing — synchronous
+
+**Decision:** The interview-submit request blocks on the server until the generated plan is
+ready; there is no job queue, polling endpoint, or "generation in progress" persisted state for
+v1.
+
+**Why:** Simplicity, weighed against the single-user/self-hosted scope already locked above: one
+generation call competes with no other traffic on a self-hosted instance, so the async
+alternative's main benefit (not blocking other users' requests) doesn't apply here. A synchronous
+call also avoids inventing a persisted "pending generation" concept that would need its own
+data-model and recovery-on-crash handling for a feature (multi-tenant throughput) v1 doesn't have.
+Async generation can be revisited if generation latency in practice makes a blocking request a
+bad interactive experience, or if scope ever expands past single-user.
+
+**How to apply:** The server-side plan-generation route makes one Claude API call (with `web_search`
+per the certification-scope decision above) and returns the resulting plan data in the same HTTP
+response the interview submission triggered. The client shows a loading state for the duration of
+that request; no separate status-check endpoint is needed. Streaming the response is an
+implementation detail for managing that wait, not a change to this decision — the request is still
+one round trip from the client's perspective.
