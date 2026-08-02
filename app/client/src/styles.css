@@ -1,52 +1,171 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
 
 :root {
-  /* ---------- Fonts ---------- */
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* ---------- Fonts (theme-invariant) ---------- */
+  --font-display: 'Karla', -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Lora', Georgia, 'Times New Roman', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
 
-  /* ---------- Backgrounds ---------- */
-  --color-bg: #0b1e33;
-  --color-bg-inset: #0a1a2e;
-  --color-panel: rgba(10, 26, 46, 0.5);
-  --color-panel-strong: rgba(10, 26, 46, 0.6);
-  --color-panel-heavy: rgba(10, 26, 46, 0.7);
+  /* ---------- Radius (theme-invariant) ---------- */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
 
-  /* ---------- Borders ---------- */
-  --color-border: #3b5a75;
-  --color-border-subtle: #23394d;
+  /* ---------- Backgrounds (light) ---------- */
+  --color-bg: #EFF2F0;
+  --color-bg-inset: color-mix(in srgb, #EFF2F0 92%, black 8%);
+  --color-panel: color-mix(in srgb, #FFFFFF 85%, #EFF2F0 15%);
+  --color-panel-strong: color-mix(in srgb, #FFFFFF 92%, #EFF2F0 8%);
+  --color-panel-heavy: #FFFFFF;
 
-  /* ---------- Text ---------- */
-  --color-text: #edeff2;
-  --color-text-secondary: #dce4eb;
-  --color-text-tertiary: #b7c9da;
-  --color-text-muted: #8fa8bf;
-  --color-text-dim: #6e8aa3;
-  --color-text-faint: #5c7a99;
-  --color-text-disabled: #7e93a6;
+  /* ---------- Borders (light) ---------- */
+  --color-border: #DBE1DE;
+  --color-border-subtle: rgba(98, 109, 107, 0.15);
 
-  /* ---------- Accent (brand) ---------- */
-  --color-accent: #e8a33d;
-  --color-accent-tint: rgba(232, 163, 61, 0.12);
-  --color-accent-light: #f3d9a8;
-  --color-on-accent: #0b1e33;
+  /* ---------- Text (light) ---------- */
+  --color-text: #1B2733;
+  --color-text-secondary: #626D6B;
+  --color-text-tertiary: color-mix(in srgb, #626D6B 75%, #9FADAA 25%);
+  --color-text-muted: color-mix(in srgb, #626D6B 45%, #9FADAA 55%);
+  --color-text-dim: color-mix(in srgb, #626D6B 20%, #9FADAA 80%);
+  --color-text-faint: #9FADAA;
+  --color-text-disabled: color-mix(in srgb, #9FADAA 60%, #EFF2F0 40%);
 
-  /* ---------- Link / interactive blue ---------- */
-  --color-link: #7fb3d5;
-  --color-link-muted: #4a7fa6;
-  --color-link-tint: rgba(127, 179, 213, 0.08);
-  --color-grid-line: rgba(127, 179, 213, 0.07);
+  /* ---------- Accent (light — Poppy, warm) ---------- */
+  --color-accent: #A83D1B;
+  --color-accent-tint: rgba(168, 61, 27, 0.12);
+  --color-accent-light: color-mix(in srgb, #A83D1B 85%, black 15%);
+  --color-on-accent: #FFFFFF;
 
-  /* ---------- Danger / error ---------- */
-  --color-danger: #c1503f;
-  --color-danger-strong: #b0453a;
-  --color-danger-light: #e8b0a9;
-  --color-danger-tint: rgba(193, 80, 63, 0.12);
+  /* ---------- Link / interactive (light — Denim, cool) ---------- */
+  --color-link: #3E76A6;
+  --color-link-muted: color-mix(in srgb, #3E76A6 80%, black 20%);
+  --color-link-tint: rgba(62, 118, 166, 0.08);
 
-  /* ---------- Success ---------- */
-  --color-success: #6fbe7a;
-  --color-success-light: #b8e6be;
-  --color-success-tint: rgba(111, 190, 122, 0.12);
+  /* ---------- Danger / error (light) ---------- */
+  --color-danger: #B14C3C;
+  --color-danger-strong: color-mix(in srgb, #B14C3C 85%, black 15%);
+  --color-danger-light: color-mix(in srgb, #B14C3C 70%, black 30%);
+  --color-danger-tint: rgba(177, 76, 60, 0.12);
+
+  /* ---------- Success (light) ---------- */
+  --color-success: #3F8F6C;
+  --color-success-light: color-mix(in srgb, #3F8F6C 85%, black 15%);
+  --color-success-tint: rgba(63, 143, 108, 0.12);
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --color-bg: #131E1F;
+    --color-bg-inset: color-mix(in srgb, #131E1F 85%, black);
+    --color-panel: rgba(28, 43, 43, 0.5);
+    --color-panel-strong: rgba(28, 43, 43, 0.6);
+    --color-panel-heavy: rgba(28, 43, 43, 0.7);
+
+    --color-border: #2A3A39;
+    --color-border-subtle: rgba(98, 109, 107, 0.3);
+
+    --color-text: #E7EDEB;
+    --color-text-secondary: #9FADAA;
+    --color-text-tertiary: color-mix(in srgb, #9FADAA 80%, #626D6B 20%);
+    --color-text-muted: color-mix(in srgb, #9FADAA 55%, #626D6B 45%);
+    --color-text-dim: color-mix(in srgb, #9FADAA 30%, #626D6B 70%);
+    --color-text-faint: #626D6B;
+    --color-text-disabled: color-mix(in srgb, #626D6B 70%, #131E1F 30%);
+
+    --color-accent: #F0916A;
+    --color-accent-tint: rgba(240, 145, 106, 0.12);
+    --color-accent-light: color-mix(in srgb, #F0916A 75%, white 25%);
+    --color-on-accent: #131E1F;
+
+    --color-link: #9CC4E8;
+    --color-link-muted: color-mix(in srgb, #9CC4E8 55%, #131E1F 45%);
+    --color-link-tint: rgba(156, 196, 232, 0.08);
+
+    --color-danger: #B14C3C;
+    --color-danger-strong: color-mix(in srgb, #B14C3C 85%, black 15%);
+    --color-danger-light: #E0836F;
+    --color-danger-tint: rgba(177, 76, 60, 0.12);
+
+    --color-success: #3F8F6C;
+    --color-success-light: #6FBE97;
+    --color-success-tint: rgba(63, 143, 108, 0.12);
+  }
+}
+
+:root[data-theme="dark"]{
+  --color-bg: #131E1F;
+  --color-bg-inset: color-mix(in srgb, #131E1F 85%, black);
+  --color-panel: rgba(28, 43, 43, 0.5);
+  --color-panel-strong: rgba(28, 43, 43, 0.6);
+  --color-panel-heavy: rgba(28, 43, 43, 0.7);
+
+  --color-border: #2A3A39;
+  --color-border-subtle: rgba(98, 109, 107, 0.3);
+
+  --color-text: #E7EDEB;
+  --color-text-secondary: #9FADAA;
+  --color-text-tertiary: color-mix(in srgb, #9FADAA 80%, #626D6B 20%);
+  --color-text-muted: color-mix(in srgb, #9FADAA 55%, #626D6B 45%);
+  --color-text-dim: color-mix(in srgb, #9FADAA 30%, #626D6B 70%);
+  --color-text-faint: #626D6B;
+  --color-text-disabled: color-mix(in srgb, #626D6B 70%, #131E1F 30%);
+
+  --color-accent: #F0916A;
+  --color-accent-tint: rgba(240, 145, 106, 0.12);
+  --color-accent-light: color-mix(in srgb, #F0916A 75%, white 25%);
+  --color-on-accent: #131E1F;
+
+  --color-link: #9CC4E8;
+  --color-link-muted: color-mix(in srgb, #9CC4E8 55%, #131E1F 45%);
+  --color-link-tint: rgba(156, 196, 232, 0.08);
+
+  --color-danger: #B14C3C;
+  --color-danger-strong: color-mix(in srgb, #B14C3C 85%, black 15%);
+  --color-danger-light: #E0836F;
+  --color-danger-tint: rgba(177, 76, 60, 0.12);
+
+  --color-success: #3F8F6C;
+  --color-success-light: #6FBE97;
+  --color-success-tint: rgba(63, 143, 108, 0.12);
+}
+
+:root[data-theme="light"]{
+  --color-bg: #EFF2F0;
+  --color-bg-inset: color-mix(in srgb, #EFF2F0 92%, black 8%);
+  --color-panel: color-mix(in srgb, #FFFFFF 85%, #EFF2F0 15%);
+  --color-panel-strong: color-mix(in srgb, #FFFFFF 92%, #EFF2F0 8%);
+  --color-panel-heavy: #FFFFFF;
+
+  --color-border: #DBE1DE;
+  --color-border-subtle: rgba(98, 109, 107, 0.15);
+
+  --color-text: #1B2733;
+  --color-text-secondary: #626D6B;
+  --color-text-tertiary: color-mix(in srgb, #626D6B 75%, #9FADAA 25%);
+  --color-text-muted: color-mix(in srgb, #626D6B 45%, #9FADAA 55%);
+  --color-text-dim: color-mix(in srgb, #626D6B 20%, #9FADAA 80%);
+  --color-text-faint: #9FADAA;
+  --color-text-disabled: color-mix(in srgb, #9FADAA 60%, #EFF2F0 40%);
+
+  --color-accent: #A83D1B;
+  --color-accent-tint: rgba(168, 61, 27, 0.12);
+  --color-accent-light: color-mix(in srgb, #A83D1B 85%, black 15%);
+  --color-on-accent: #FFFFFF;
+
+  --color-link: #3E76A6;
+  --color-link-muted: color-mix(in srgb, #3E76A6 80%, black 20%);
+  --color-link-tint: rgba(62, 118, 166, 0.08);
+
+  --color-danger: #B14C3C;
+  --color-danger-strong: color-mix(in srgb, #B14C3C 85%, black 15%);
+  --color-danger-light: color-mix(in srgb, #B14C3C 70%, black 30%);
+  --color-danger-tint: rgba(177, 76, 60, 0.12);
+
+  --color-success: #3F8F6C;
+  --color-success-light: color-mix(in srgb, #3F8F6C 85%, black 15%);
+  --color-success-tint: rgba(63, 143, 108, 0.12);
 }
 
 * {
@@ -80,14 +199,25 @@ select {
   min-height: 100vh;
 }
 
-.grid-bg {
+.theme-toggle {
   position: fixed;
-  inset: 0;
-  background-image: linear-gradient(var(--color-grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px);
-  background-size: 28px 28px;
-  pointer-events: none;
-  z-index: 0;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: var(--color-panel-heavy);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+}
+.theme-toggle:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .sidebar {
@@ -132,7 +262,7 @@ select {
   align-items: center;
   gap: 9px;
   padding: 8px 8px;
-  border-radius: 2px;
+  border-radius: var(--r-sm);
   color: var(--color-text-tertiary);
   text-decoration: none;
   font-size: 13.5px;
@@ -186,6 +316,7 @@ select {
   border: 1px solid var(--color-border);
   background: var(--color-panel-strong);
   padding: 18px 22px;
+  border-radius: var(--r-md);
 }
 .eyebrow {
   font-family: var(--font-mono);
@@ -209,6 +340,7 @@ select {
   border: 1px solid var(--color-border);
   background: var(--color-panel);
   padding: 18px 20px;
+  border-radius: var(--r-md);
 }
 
 .section-label {
@@ -232,6 +364,7 @@ select {
   border: 1px solid var(--color-border);
   background: var(--color-bg-inset);
   padding: 14px 16px;
+  border-radius: var(--r-sm);
 }
 .total-label {
   font-family: var(--font-mono);
@@ -262,6 +395,8 @@ select {
   background: var(--color-bg-inset);
   border: 1px solid var(--color-border);
   margin-top: 8px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
 }
 .progress-track.small {
   height: 6px;
@@ -288,6 +423,7 @@ select {
   padding: 14px 18px;
   text-decoration: none;
   color: inherit;
+  border-radius: var(--r-md);
 }
 .phase-card:hover {
   border-color: var(--color-link);
@@ -377,6 +513,7 @@ select {
   padding: 8px 12px;
   font-size: 13.5px;
   cursor: pointer;
+  border-radius: var(--r-sm);
 }
 .quiz-option:hover:not(:disabled) {
   border-color: var(--color-link);
@@ -414,6 +551,7 @@ select {
   font-size: 12px;
   padding: 5px 9px;
   cursor: pointer;
+  border-radius: var(--r-sm);
 }
 .mini-btn:hover {
   border-color: var(--color-accent);
@@ -436,6 +574,7 @@ select {
   padding: 8px 10px;
   font-family: var(--font-mono);
   font-size: 13px;
+  border-radius: var(--r-sm);
 }
 .field-full {
   flex: 1;
@@ -461,6 +600,7 @@ select {
   font-size: 12.5px;
   padding: 9px 16px;
   cursor: pointer;
+  border-radius: var(--r-sm);
 }
 .add-btn:disabled {
   background: var(--color-border);
@@ -485,6 +625,7 @@ select {
   font-size: 12.5px;
   padding: 9px 16px;
   cursor: pointer;
+  border-radius: var(--r-sm);
 }
 .stamp-btn:disabled {
   background: var(--color-border);
@@ -562,6 +703,8 @@ select {
   height: 6px;
   background: var(--color-bg-inset);
   border: 1px solid var(--color-border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
 }
 .phase-row-fill {
   height: 100%;
@@ -595,6 +738,7 @@ select {
   border: 1px solid var(--color-border);
   background: var(--color-panel);
   padding: 10px;
+  border-radius: var(--r-md);
 }
 .resources-nav-item {
   text-align: left;
@@ -604,7 +748,7 @@ select {
   font-size: 12.5px;
   padding: 8px 10px;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: var(--r-sm);
 }
 .resources-nav-item:hover {
   background: var(--color-link-tint);
@@ -619,6 +763,7 @@ select {
   line-height: 1.6;
   font-size: 14px;
   color: var(--color-text-secondary);
+  font-family: var(--font-body);
 }
 .markdown-body h1,
 .markdown-body h2,
@@ -634,6 +779,7 @@ select {
   padding: 1px 5px;
   border: 1px solid var(--color-border);
   font-size: 12.5px;
+  border-radius: var(--r-sm);
 }
 .markdown-body table {
   border-collapse: collapse;
@@ -674,6 +820,7 @@ select {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  border-radius: var(--r-md);
 }
 .interview-card h1 {
   font-size: 22px;
@@ -692,6 +839,7 @@ select {
   color: var(--color-text-faint);
   border: 1px solid var(--color-border);
   padding: 4px 8px;
+  border-radius: var(--r-sm);
 }
 .interview-progress-step.active {
   color: var(--color-accent);
@@ -722,6 +870,7 @@ select {
   font-family: var(--font-display);
   font-size: 13.5px;
   resize: vertical;
+  border-radius: var(--r-sm);
 }
 .option-list {
   display: flex;
@@ -736,6 +885,7 @@ select {
   padding: 9px 12px;
   font-size: 13.5px;
   cursor: pointer;
+  border-radius: var(--r-sm);
 }
 .option-btn:hover {
   border-color: var(--color-link);
@@ -779,6 +929,7 @@ select {
   line-height: 1.6;
   border-left: 2px solid var(--color-accent);
   padding-left: 12px;
+  font-family: var(--font-body);
 }
 
 @media (max-width: 900px) {

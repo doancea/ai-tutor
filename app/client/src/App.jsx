@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Routes, Route, NavLink } from 'react-router-dom';
-import { LayoutDashboard, ListChecks, Clock, Target, BookOpen } from 'lucide-react';
+import { LayoutDashboard, ListChecks, Clock, Target, BookOpen, Sun, Moon } from 'lucide-react';
 import Dashboard from './pages/Dashboard.jsx';
 import Phase from './pages/Phase.jsx';
 import TimeLog from './pages/TimeLog.jsx';
@@ -8,10 +8,20 @@ import Diagnostics from './pages/Diagnostics.jsx';
 import Resources from './pages/Resources.jsx';
 import Interview from './pages/Interview.jsx';
 import { api } from './api.js';
+import { useTheme } from './useTheme.js';
+
+function ThemeToggle({ theme, onToggle }) {
+  return (
+    <button className="theme-toggle" onClick={onToggle} aria-label="Toggle theme" title="Toggle theme">
+      {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+    </button>
+  );
+}
 
 export default function App() {
   const [phases, setPhases] = useState(null);
   const [onboarded, setOnboarded] = useState(null);
+  const [theme, toggleTheme] = useTheme();
 
   const reload = useCallback(() => {
     api.getPhases().then(setPhases).catch(console.error);
@@ -35,7 +45,7 @@ export default function App() {
   if (!onboarded) {
     return (
       <div className="app-shell">
-        <div className="grid-bg" />
+        <ThemeToggle theme={theme} onToggle={toggleTheme} />
         <Interview onComplete={() => setOnboarded(true)} />
       </div>
     );
@@ -43,7 +53,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <div className="grid-bg" />
+      <ThemeToggle theme={theme} onToggle={toggleTheme} />
       <nav className="sidebar">
         <div className="brand">
           <div className="brand-eyebrow">AI TUTOR</div>
