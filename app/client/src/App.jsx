@@ -21,6 +21,7 @@ function ThemeToggle({ theme, onToggle }) {
 export default function App() {
   const [phases, setPhases] = useState(null);
   const [onboarded, setOnboarded] = useState(null);
+  const [targetCertification, setTargetCertification] = useState(null);
   const [theme, toggleTheme] = useTheme();
 
   const reload = useCallback(() => {
@@ -30,7 +31,10 @@ export default function App() {
   useEffect(() => {
     api
       .getOnboardingStatus()
-      .then((s) => setOnboarded(s.onboarded))
+      .then((s) => {
+        setOnboarded(s.onboarded);
+        setTargetCertification(s.targetCertification);
+      })
       .catch(() => setOnboarded(true)); // fail open to the normal app rather than trapping on a status error
   }, []);
 
@@ -84,7 +88,7 @@ export default function App() {
       </nav>
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Dashboard phases={phases} />} />
+          <Route path="/" element={<Dashboard phases={phases} targetCertification={targetCertification} />} />
           <Route path="/phase/:id" element={<Phase phases={phases} reload={reload} />} />
           <Route path="/time" element={<TimeLog phases={phases} />} />
           <Route path="/diagnostics" element={<Diagnostics />} />

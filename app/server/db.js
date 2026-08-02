@@ -7,11 +7,12 @@ const seed = require('./seed');
 const dataDir = path.join(__dirname, '..', 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
-const file = path.join(dataDir, 'ccarf.json');
+const file = path.join(dataDir, 'learning-plan.json');
 const adapter = new FileSync(file);
 const db = low(adapter);
 
 const emptyDefaults = {
+  targetCertification: null,
   phases: [],
   tasks: [],
   quizQuestions: [],

@@ -5,7 +5,10 @@ const { generatePlan } = require('../agent');
 
 // Whether onboarding (the Groups A-F interview) has been completed yet.
 router.get('/onboarding', (req, res) => {
-  res.json({ onboarded: !!db.get('onboarded').value() });
+  res.json({
+    onboarded: !!db.get('onboarded').value(),
+    targetCertification: db.get('targetCertification').value() || null,
+  });
 });
 
 // Runs the interview answers through the plan-generation agent call and
@@ -22,7 +25,8 @@ router.post('/interview', async (req, res) => {
   try {
     const { targetCertification, agentNotes, phases, tasks, quizQuestions } = await generatePlan(answers);
 
-    db.set('phases', phases)
+    db.set('targetCertification', targetCertification)
+      .set('phases', phases)
       .set('tasks', tasks)
       .set('quizQuestions', quizQuestions)
       .set('quizAnswers', [])

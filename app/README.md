@@ -45,18 +45,18 @@ for normal use once you're done making changes.
 ## Data
 
 Everything you enter — task checkboxes, quiz answers, phase stamps, time log entries, diagnostic
-results, and the generated plan itself — lives in a single plain-JSON file: `data/ccarf.json`.
+results, and the generated plan itself — lives in a single plain-JSON file: `data/learning-plan.json`.
 Your raw interview answers are never written there or anywhere else; only the plan the agent
 generates from them is persisted.
 
-**First run:** with no existing `data/ccarf.json`, the app opens straight into the onboarding
+**First run:** with no existing `data/learning-plan.json`, the app opens straight into the onboarding
 interview instead of the tracker. Completing it triggers the one-time plan-generation call and
 switches the app into normal tracker mode from then on.
 
-**Backup:** just copy `data/ccarf.json` somewhere safe. It's human-readable — you can open and edit
+**Backup:** just copy `data/learning-plan.json` somewhere safe. It's human-readable — you can open and edit
 it directly if you ever need to fix something by hand.
 
-**Reset:** delete `data/ccarf.json` and restart the server; you'll go through the interview again
+**Reset:** delete `data/learning-plan.json` and restart the server; you'll go through the interview again
 from scratch (you'll lose all logged progress, so back it up first if in doubt).
 
 **Demo/dev data:** set `SEED_DEMO=true` before first run to seed the original hand-authored
@@ -75,6 +75,6 @@ ai-tutor/
 ├── server/          Express API + lowdb data layer + plan-generation agent call
 ├── client/           React + Vite frontend, including the onboarding interview
 ├── docs/              Resource markdown (read-only reference content)
-├── data/              ccarf.json — all your logged state (created on first run)
+├── data/              learning-plan.json — all your logged state (created on first run)
 └── package.json       Root scripts: dev, build, start
 ```

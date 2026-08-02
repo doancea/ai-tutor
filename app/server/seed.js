@@ -1,5 +1,5 @@
 // Initial seed data for the lowdb store. Only used the first time the app runs
-// (when data/ccarf.json doesn't exist yet) — after that, the file is the source of truth.
+// (when data/learning-plan.json doesn't exist yet) — after that, the file is the source of truth.
 
 const phases = [
   { id: 0, title: 'Foundations', weight: null, hoursTarget: [8, 10] },
@@ -134,6 +134,7 @@ const diagnosticRuns = [
 ];
 
 module.exports = {
+  targetCertification: 'CCAR-F',
   phases,
   tasks,
   quizQuestions,

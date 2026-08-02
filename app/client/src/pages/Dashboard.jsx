@@ -10,7 +10,7 @@ function fmtHrs(minutes) {
   return `${h}h ${m}m`;
 }
 
-export default function Dashboard({ phases }) {
+export default function Dashboard({ phases, targetCertification }) {
   const [timeEntries, setTimeEntries] = useState([]);
 
   useEffect(() => {
@@ -54,7 +54,9 @@ export default function Dashboard({ phases }) {
   return (
     <div className="page">
       <header className="page-header">
-        <div className="eyebrow">CCAR-F STUDY APP</div>
+        <div className="eyebrow">
+          {targetCertification ? `${targetCertification.toUpperCase()} STUDY APP` : 'STUDY APP'}
+        </div>
         <h1>Dashboard</h1>
       </header>
 
