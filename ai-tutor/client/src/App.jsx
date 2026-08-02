@@ -24,8 +24,8 @@ export default function App() {
       <div className="grid-bg" />
       <nav className="sidebar">
         <div className="brand">
-          <div className="brand-eyebrow">CCAR-F</div>
-          <div className="brand-title">Study App</div>
+          <div className="brand-eyebrow">AI TUTOR</div>
+          <div className="brand-title">Study Plan</div>
         </div>
         <NavLink to="/" end className="nav-link">
           <LayoutDashboard size={16} /> Dashboard
