@@ -1001,3 +1001,51 @@ checks were prompted by the user asking "are you sure?" — each ran before repo
 is the same pattern this repo's grounding-methodology entries (e.g. 33, 35) already established for
 sub-agent orchestration, shown here extending naturally to ordinary environment and tooling
 verification too.
+
+## 38. A broad "describe how this works" opener whose real question surfaced five turns later — and an unprompted detail that pre-answered it
+
+**Source: this session** (2026-08-03). The user opened with "let's discuss our API integration with
+claude. Describe how that works today." The assistant read the integration (one call site,
+`app/server/agent.js`) and answered with a structural description plus four unrequested findings:
+a `pause_turn` resume loop that drops earlier assistant turns, a `.find()` that takes the first
+text block rather than the last, an unhandled `max_tokens` stop reason, and an unverified
+structured-outputs-plus-`web_search` compatibility question.
+
+**The stated question was not the actual question.** Over the next four turns the user deferred
+each finding in sequence ("capture this as an item we'll address, but not now") without engaging
+the substance of any of them, then said what they had actually been after: *"the piece I was
+interested in was actually related to the Claude SDK and whether our approach was making calls to
+the claude api directly or using the sdk for this?"* — a question the opening description had
+touched only implicitly, by showing `client.messages.create` calls without ever stating that no
+raw-HTTP path existed. The findings were useful enough to keep (all four became backlog items), but
+they were a detour relative to what prompted the conversation.
+
+**An unprompted detail turned out to pre-answer the user's next question, and the user said so
+explicitly.** Answering the SDK question, the assistant added two notes beyond the yes/no: that the
+project sits on the non-beta `client.messages` surface, and that the `pause_turn` resume loop is
+hand-written *because* the SDK's tool runner does not auto-resume `pause_turn` either — so
+hand-rolling wasn't a shortcut. The user's response: *"including the pause_turn impacts here
+actually helps clarify that too, as I definitely would have followed up the hand-rolled resume loop
+with 'why not sdk?'"* A rare case of the user naming the follow-up they didn't have to ask, which
+is the only reason it's recorded as anticipation rather than as the assistant guessing well.
+
+**Doc-scoping, exercised across three destinations in one session.** The four deferred items went
+to persistent cross-session memory rather than a repo doc — they are transient backlog, not design
+rationale, and the repo has no backlog file worth inventing for them. The SDK-vs-direct rationale
+went to `ARCHITECTURE-DECISIONS.md`, because it is a product/design decision with a "why" that
+outlives the conversation. Only the collaboration dynamics came here. There was also honest churn
+worth recording: the assistant first created a single-item memory file for finding 1, then had to
+consolidate it into a four-item file as findings 2, 3, and 4 were deferred in turn — the right
+granularity wasn't knowable until the third deferral, and the earlier file was deleted rather than
+left as a near-duplicate.
+
+**Why notable:** The generic-opener-hiding-a-specific-question pattern is the interesting part. A
+literal reading of "describe how that works today" produced a correct, thorough answer that still
+missed the point, and the gap only closed because the user restated it directly five turns later.
+The lesson for a future reader isn't "ask what they really mean up front" — the four findings were
+genuinely worth surfacing, and asking would have delayed them. It's that a broad description
+request is worth answering along more axes than the code's structure alone, including the ones that
+feel too obvious to state (*we use the SDK; nothing calls the API directly*), because the obvious
+one may be exactly what was being asked. The follow-on lesson, from the `pause_turn` note: when an
+answer names an unusual-looking implementation choice, saying why it isn't the obvious mistake it
+resembles is worth the extra sentence — the alternative is a round trip.
