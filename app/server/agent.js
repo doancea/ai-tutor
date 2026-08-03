@@ -4,6 +4,20 @@ const client = new Anthropic();
 
 const MODEL = 'claude-opus-5';
 
+// Caps *output* only — adaptive thinking, the model's own tool-use blocks, and
+// the final JSON all draw from this one budget, and the model is not told what
+// it is. The interview answers are input and don't count against it. 8000 was
+// too low: two real runs truncated, once before the JSON started and once 2933
+// characters into it.
+//
+// Measured on the first successful run: output_tokens 12,640 for a 7-phase plan
+// (~8-9K thinking + server tool use, ~3-4K of JSON), so 32000 leaves ~2.5x
+// headroom. Deliberately generous — billing is on tokens actually generated, so
+// an unused ceiling is free, and a *binding* cap is the failure mode here since
+// the model can't see it and plans as if unconstrained. Plan length is bounded
+// by the size guidance in buildSystemPrompt, not by this number.
+const MAX_TOKENS = 32000;
+
 // Content-only — no ids. The server assigns those after parsing (see
 // shapeIntoStore below), which is more robust than trusting the model for
 // uniqueness/format and keeps this schema simple enough for structured
@@ -98,6 +112,11 @@ function buildSystemPrompt() {
       'not generic Claude platform trivia, unless the track\'s real domain content is genuinely ' +
       'that broad. Quiz questions are self-checks, not the real exam — plausible multiple choice, ' +
       'one clearly correct answer, four options.',
+    '',
+    'Plan size: aim for 4-7 phases, 4-6 tasks per phase, and 3-5 quiz questions per phase. Task ' +
+      'labels are one line each, not paragraphs. These are guides, not hard rules — follow the ' +
+      "track's real domain structure if it genuinely needs a different shape — but a plan far " +
+      'past this range is a sign of padding rather than coverage.',
   ].join('\n');
 }
 
@@ -189,13 +208,29 @@ function shapeIntoStore(parsed) {
   };
 }
 
+// Logged on every response, success or failure — not just on the error paths.
+// Truncation surfaces in more than one place (before any text block, or partway
+// through the JSON), so the useful signal is the envelope itself, and
+// output_tokens on *successful* runs is what tells us where MAX_TOKENS should
+// actually sit.
+function logResponseEnvelope(label, response) {
+  console.log(
+    '[agent] %s stop_reason=%s stop_details=%j blocks=%j usage=%j',
+    label,
+    response.stop_reason,
+    response.stop_details,
+    response.content.map((block) => block.type),
+    response.usage
+  );
+}
+
 async function generatePlan(answers) {
   const system = buildSystemPrompt();
   const userText = formatAnswers(answers);
 
   const requestParams = {
     model: MODEL,
-    max_tokens: 8000,
+    max_tokens: MAX_TOKENS,
     system,
     thinking: { type: 'adaptive' },
     output_config: {
@@ -205,8 +240,15 @@ async function generatePlan(answers) {
     tools: [{ type: 'web_search_20260209', name: 'web_search' }],
   };
 
+  // Streamed rather than a plain create() call: at this max_tokens a
+  // non-streaming request risks hitting the request timeout well before the
+  // model is done thinking and searching. We don't need the individual events,
+  // so finalMessage() collapses the stream back into one response object.
+  const send = (messages) => client.messages.stream({ ...requestParams, messages }).finalMessage();
+
   let messages = [{ role: 'user', content: userText }];
-  let response = await client.messages.create({ ...requestParams, messages });
+  let response = await send(messages);
+  logResponseEnvelope('initial', response);
 
   // Server-tool turns can hit the internal iteration cap and pause; resume
   // by resending [user, assistant] with no new user turn, per the documented
@@ -216,11 +258,24 @@ async function generatePlan(answers) {
       { role: 'user', content: userText },
       { role: 'assistant', content: response.content },
     ];
-    response = await client.messages.create({ ...requestParams, messages });
+    response = await send(messages);
+    logResponseEnvelope('after pause_turn resume', response);
   }
 
   if (response.stop_reason === 'refusal') {
     throw new Error('Plan generation was declined by the model. Try adjusting your answers and resubmitting.');
+  }
+
+  // Checked before the text-block and JSON.parse steps below, because
+  // truncation can land in either of them: cut off during thinking or tool use
+  // and there's no text block at all; cut off mid-answer and there's a text
+  // block holding partial JSON. Both are this one condition, so it's caught
+  // once, here, rather than separately in each downstream failure.
+  if (response.stop_reason === 'max_tokens') {
+    throw new Error(
+      `Plan generation ran past its ${MAX_TOKENS}-token output budget before finishing the plan. ` +
+        'The generated plan was too long to complete — try again, or raise MAX_TOKENS in server/agent.js.'
+    );
   }
 
   const textBlock = response.content.find((block) => block.type === 'text');
@@ -228,7 +283,14 @@ async function generatePlan(answers) {
     throw new Error('Plan generation did not return structured output.');
   }
 
-  const parsed = JSON.parse(textBlock.text);
+  let parsed;
+  try {
+    parsed = JSON.parse(textBlock.text);
+  } catch (err) {
+    console.error('[agent] JSON.parse failed on text block of length %d', textBlock.text.length);
+    throw new Error(`Plan generation returned output that could not be parsed: ${err.message}`);
+  }
+
   return shapeIntoStore(parsed);
 }
 
