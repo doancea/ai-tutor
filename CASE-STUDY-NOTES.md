@@ -1049,3 +1049,124 @@ feel too obvious to state (*we use the SDK; nothing calls the API directly*), be
 one may be exactly what was being asked. The follow-on lesson, from the `pause_turn` note: when an
 answer names an unusual-looking implementation choice, saying why it isn't the obvious mistake it
 resembles is worth the extra sentence — the alternative is a round trip.
+
+## 39. Instrumentation scoped to the symptom instead of the root cause missed on the very next run — and the miss confirmed the diagnosis anyway
+
+**When:** 2026-08-03, session investigating a live plan-generation failure.
+
+**What happened:** The user reported a runtime failure from their running app — `Plan generation
+failed: Error: Plan generation did not return structured output.` — and asked for a read, noting
+they had a suspicion of their own and wanted an independent check rather than a fix.
+
+Working backwards from `app/server/agent.js`, the throw could only be reached if the API call had
+returned 200, exited the `pause_turn` loop, and not been a refusal — meaning the response contained
+**zero blocks of type `text`**. The read given was: `max_tokens: 8000` is a hard cap on thinking +
+server-tool blocks + response text *combined*, the model is not told about it, and at
+`effort: 'high'` with adaptive thinking and multi-round `web_search` it was exhausted before the
+structured output ever began. That read explicitly named **two landing spots for the same root
+cause**: truncation *before* the text block opens produces the observed "no structured output"
+error, while truncation *inside* the JSON produces a `JSON.parse` SyntaxError — the symptom already
+on file as deferred item 3 in `agent.js`.
+
+The user approved adding diagnostic logging and restarting. The logging was added **only to the
+`!textBlock` branch** — the branch that had failed the previous time — logging `stop_reason`,
+`stop_details`, block types, and `usage`.
+
+The re-run failed through the *other* branch:
+`SyntaxError: Unterminated string in JSON at position 2933`. A text block existed, so the new
+logging never fired, and `stop_reason`/`usage` still went uncaptured.
+
+**Why notable:** Two distinct things, and they cut in opposite directions.
+
+The diagnosis was right at the root-cause level and got confirmed harder by failing differently
+than expected: one fixed budget producing truncation at two different points across two runs is
+much stronger evidence of a length cap than two identical failures would have been. "Unterminated
+string at position 2933" also rules out the neighbouring hypothesis (deferred item 2, `.find()`
+grabbing interleaved commentary text instead of the final JSON) — parsing 2933 valid characters
+before running out means it was JSON that got cut, not prose that was never JSON.
+
+But the instrumentation was scoped to the *symptom last observed* rather than to the *cause just
+identified*, even though the same analysis had, one paragraph earlier, named both places that cause
+could surface. The failure mode is subtle because the logging was not wrong — it was correct,
+useful, and in the wrong branch. A future reader instrumenting a suspected single root cause with
+multiple landing spots should instrument every branch the cause can reach, not the one that
+happened to fire most recently.
+
+**Secondary finding — deferred item 4 answered empirically.** `agent.js` deferred item 4 was an
+open question, not a known defect: whether `output_config.format` (`json_schema`) and the
+`web_search_20260209` tool are compatible at all, given structured outputs are documented as
+incompatible with citations (400) and search results carry citations. The standing instruction was
+to not speculate a fix or change the request shape until a real interview run produced evidence.
+Two runs now supply it: both returned **200**, and the second emitted well-formed JSON that was
+merely cut short. The combination works; the question is closed by observation rather than by
+reasoning about the docs, which is exactly how the deferral was set up to resolve.
+
+## 40. Five runs, three distinct failure modes, one confirmed root cause — and a "don't automate around a failure you haven't explained yet" call that was right for a different reason than the one given
+
+**When:** 2026-08-03, continuing the session in entry 39.
+
+**What happened:** After the diagnosis in entry 39 (`max_tokens: 8000` too low, truncating in two
+different places), the user approved four changes: raise the ceiling to 32000, switch to streaming,
+move the diagnostic, and — unprompted, flagged as such — bound plan size via the system prompt
+rather than the schema, since `PLAN_SCHEMA`'s header comment deliberately avoids length
+constraints.
+
+The `max_tokens` check was deliberately placed **upstream of both** the text-block lookup and
+`JSON.parse`, so the single root cause is caught once rather than separately at each place it can
+surface — the structural fix for entry 39's instrumentation miss.
+
+Runs 3 and 4 then failed with something new: `overloaded_error`, twice, 76 seconds apart. Digging
+in surfaced a real consequence of the streaming switch: the error arrived **mid-stream as an SSE
+`error` event** (`status: undefined`, `content-type: text/event-stream`), and
+`core/streaming.js:117` throws `new APIError(undefined, body, ...)` from inside the stream iterator
+*after* the HTTP response already succeeded. The SDK's automatic retry keys off HTTP response
+status in the request layer, so this class was never retried — non-streaming, the same overload
+would have come back as a 529 and been silently retried twice. Switching to streaming was necessary
+at 32K, but it traded away automatic retry coverage, and that trade had been recommended without
+being flagged.
+
+A retry wrapper was proposed. The user declined for now: *"hold off on the retry until we have
+confirmed the fix. we do want that but I want confirmation of a root cause and a solution before we
+auto retry a failing call."*
+
+That instinct was right, but the stated reason didn't quite apply, and saying so mattered: the
+proposed wrapper caught only `overloaded_error` / `api_error`, whereas `max_tokens` truncation
+returns a *successful* response with `stop_reason: 'max_tokens'` and never throws — so retry could
+not have masked the bug being chased. The stronger argument for waiting was the one neither side had
+stated: **there were still zero successful runs.** Nothing had yet confirmed 32K was sufficient,
+that streaming worked end-to-end, or that the JSON parsed. Retry would have been automation layered
+on a completely unvalidated path, at 4x the cost and latency of a single clean failure.
+
+Run 5 succeeded: `stop_reason=end_turn`, `output_tokens` **12,640** against the 32000 cap (39%
+utilization), 3 web searches, zero `pause_turn` rounds, 7 phases / 41 tasks / 28 quiz questions, all
+28 quizzes with exactly four options and a valid index, domain weights summing to 100%.
+
+**Why notable:** Three things.
+
+*The norm did work, and got sharpened rather than just accepted.* "Confirm the root cause before
+automating retries" is a good rule, and agreeing with it while correcting the mechanism — retry
+wouldn't have hidden *this* bug, but the path was unvalidated, which is worse — is the kind of
+exchange the collaboration norms in `CLAUDE.md` are meant to produce. Reflexive agreement would have
+left a wrong model of why the rule applied.
+
+*Two quantitative claims made confidently were wrong, and only measurement caught them.* The
+assistant had estimated input at "~1.5K tokens — noise" when answering whether the interview data
+or the plan was responsible. Actual input was **97,533 tokens** — off by ~65x, because
+`web_search_tool_result` content is re-fed as input on every internal iteration. The *conclusion*
+survived (`max_tokens` caps output only, so input was never the constraint) but the number did not,
+and it materially changes per-run cost (~$0.49 input vs. the fraction of a cent implied). The lesson
+is narrow and practical: an estimate of the initial request is not an estimate of the call.
+
+*The response contained block types that were never requested.* `tools` declared only
+`web_search_20260209`, yet the successful response contained four `code_execution_tool_result`
+blocks. Best inference is that the `_20260209` variant's dynamic result filtering runs server-side
+code and surfaces those blocks — flagged as observation, not verified claim. Practical takeaway for
+anyone iterating `response.content` by block type: server tools can emit types you did not declare,
+so tolerate unknown ones.
+
+**Still open, and flagged twice without being picked up:** interview answers are not persisted
+before the agent call (`routes/interview.js` writes to the store only on success), so each of the
+four failures destroyed a full survey and required manual re-entry. It also means a generated plan
+can't be evaluated against the answers that produced it — which surfaced immediately when the user
+noticed the plan compressed the CCAR-F foundations track into a single phase and there was no
+recorded input to check that judgment against.
