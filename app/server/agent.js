@@ -244,7 +244,37 @@ async function generatePlan(answers) {
   // non-streaming request risks hitting the request timeout well before the
   // model is done thinking and searching. We don't need the individual events,
   // so finalMessage() collapses the stream back into one response object.
-  const send = (messages) => client.messages.stream({ ...requestParams, messages }).finalMessage();
+  //
+  // Retried here rather than left to the SDK: streaming moves this class of
+  // failure out of the SDK's automatic retry. An overload that lands after the
+  // stream is established arrives as an SSE `error` event and is thrown from
+  // inside the stream iterator with status undefined, whereas the SDK's retry
+  // keys off the HTTP response status — so it never sees it. Non-streaming,
+  // the same overload would come back as a 529 and be retried silently.
+  //
+  // Only transient server-side classes are retried. A refusal, a max_tokens
+  // truncation, or a schema error is not going to be fixed by asking again,
+  // and each attempt costs a full thinking-plus-search run.
+  const send = async (messages, attempts = 4) => {
+    for (let attempt = 1; ; attempt++) {
+      try {
+        return await client.messages.stream({ ...requestParams, messages }).finalMessage();
+      } catch (err) {
+        const transient = err?.type === 'overloaded_error' || err?.type === 'api_error';
+        if (!transient || attempt === attempts) throw err;
+        const waitMs = 2000 * 2 ** (attempt - 1);
+        console.log(
+          '[agent] %s (request_id=%s) — attempt %d/%d failed, retrying in %dms',
+          err.type,
+          err.requestID || 'unknown',
+          attempt,
+          attempts,
+          waitMs
+        );
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      }
+    }
+  };
 
   let messages = [{ role: 'user', content: userText }];
   let response = await send(messages);
