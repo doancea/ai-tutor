@@ -101,6 +101,25 @@ v1 and shouldn't shape schema decisions going forward — schema work should ass
 user's data per running instance. Revisit the struck-through multi-user paragraph above only if
 scope explicitly expands beyond single-user/self-hosted later.
 
+> **Update (2026-08-03) — that expansion has now been named, for v2.** A closed beta — hosted,
+> gated by one-time-use codes, run among professional colleagues rather than opened to public
+> signup — is captured in `BACKLOG.md` as v2, and it deliberately reverses the
+> transcript-handling rule above: interview answers *and* generated plans are to be collected, for
+> refinement of the grounding work. That is precisely the "datamining use" retired here, so it is
+> recorded as an explicit supersession rather than allowed to drift — which is what the paragraph
+> above asks for ("deliberately adding one would be its own consent/privacy decision, not a
+> byproduct of this one"). **The reversal is scoped to hosted deployments only**: self-hosted v1
+> keeps never-persisted unchanged. The consent, retention, identifiability, and deletion questions
+> the reversal opens are listed in `BACKLOG.md` under v2 and are part of that tier's definition of
+> done, not launch-time cleanup. Scoped to v2 specifically — `BACKLOG.md`'s v3 records why that
+> posture cannot carry into a paid, openly-reachable version.
+>
+> A smaller, earlier question sits at `BACKLOG.md` v1.5: a user-initiated download of their own
+> grounding file, still self-hosted, with opt-in sharing. That is arguably not "retention" in the
+> sense retired here — no operator, no central collector, the person exporting is the person who
+> entered the answers — but the wording above is broad enough that it needs an explicit, scoped
+> clarification rather than being absorbed silently. Flagged there as a pre-build check.
+
 ## Certification scope for v1 — open-ended, not a fixed track list
 
 **Decision:** The agent is not restricted to a hand-encoded list of supported certification
@@ -184,7 +203,59 @@ defaults and the fourth looks like a mistake:
 
 **How to apply:** Keep `agent.js` as the single Claude call site — new agent capabilities belong
 there rather than in a second client elsewhere in the server. Do not "modernize" the resume loop
-into the tool runner; the loop's known defects (see the four deferred items — dropped history and
-no iteration cap) are ours to fix in place, and an SDK upgrade will not resolve them. Revisiting
+into the tool runner; the loop's known defects (see `BACKLOG.md` — dropped history and no iteration
+cap) are ours to fix in place, and an SDK upgrade will not resolve them. Revisiting
 the non-beta choice is triggered by needing a specific beta feature, `fallbacks` being the likely
 first one — not by the tool runner.
+
+## Multi-credential / staged certification paths — the plan needs a credential concept
+
+**Decision:** The plan data model gains an explicit credential grouping. Today there is a single
+`targetCertification` string and a flat `phases[]` array, which can represent exactly one
+credential; a plan spanning a staged path (foundations → professional) has nowhere structural to
+express the staging. The direction is additive: a `credentials[]` array (`{id, name, status}`,
+ordered) plus a `credentialId` on each phase, leaving the flat `phases[]` in place so existing
+consumers keep working and progress can roll up per credential rather than across the whole plan.
+
+The exact field set is **not** locked — `status`, how exam weights attach per credential, and
+whether the tracker UI shows a milestone moment between credentials are open. What is settled is
+the shape of the problem: one credential per plan is a real constraint, and it should be relaxed
+in the data model rather than worked around in the prompt.
+
+**Why:** This surfaced empirically on the first real generation run (2026-08-03), not from design
+review. The user's interview named both Architect certifications — Foundations and Professional.
+The generated plan did account for both, but compressed all of Foundations into a single 7-10 hour
+phase while giving Professional six proportionally-weighted phases.
+
+The tell was not the compressed phase, it was this, returned in `targetCertification`:
+
+> `"Claude Certified Architect – Professional (CCAR-P), reached via Architect Foundations (CCAR-F)
+> as a staged milestone"`
+
+That is a free-text field carrying structure. Given one string and one flat phase list, the model
+had two options: emit both full plans concatenated (doubling length and making tracker progress
+meaningless — "60% complete" across two credentials with separate exams says nothing), or compress
+the earlier credential into a milestone phase. It chose the latter, which is arguably the *correct*
+call under the constraint rather than a failure. When a model encodes a relationship into a string
+field the schema can't hold, that is a reliable signal the schema is missing a concept — a cleaner
+diagnostic than the output symptom itself.
+
+Prompt-tuning ("give foundations proportional treatment") was considered and rejected: it fights
+the data model rather than fixing it, and would make progress semantics worse, not better, by
+producing a longer flat list with no credential boundary.
+
+**Caveat, recorded because it is not resolvable after the fact:** it is not actually known whether
+the compression was wrong. If the interview answers indicated the foundations material was already
+largely covered, 7-10 hours is the right answer and there is no defect here at all. The answers are
+not persisted (by explicit decision — see "Single-user, self-hosted scope decision" above), so there
+is no record to check the judgment against. The design gap stands on the `targetCertification`
+evidence regardless, but the severity is unmeasured. This is the strongest argument on the record
+for revisiting the never-persisted decision, and notably it is an *evaluation* argument, not a UX
+one — the UX case that was initially assumed alongside it turned out not to exist, since
+`client/src/pages/Interview.jsx` retains answers across a failed generation. See `BACKLOG.md` v1.5
+and v2 for where retention is actually taken up.
+
+**How to apply:** Treat single-credential as a current limitation, not an invariant, when doing
+schema work. Anything that assumes one `targetCertification` per store — progress rollups, the
+cert label in the UI, completion criteria — is a site that will need revisiting. Do not address
+staged paths by adding instructions to `buildSystemPrompt`.
