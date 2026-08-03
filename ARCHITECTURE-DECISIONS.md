@@ -153,3 +153,38 @@ response the interview submission triggered. The client shows a loading state fo
 that request; no separate status-check endpoint is needed. Streaming the response is an
 implementation detail for managing that wait, not a change to this decision — the request is still
 one round trip from the client's perspective.
+
+## Claude API access — official SDK, server-side only, non-beta surface, hand-rolled resume loop
+
+**Decision:** All Claude API access goes through the official `@anthropic-ai/sdk` Node package,
+called only from the server, only on the non-beta `client.messages.create` surface, from a single
+call site (`app/server/agent.js`). The `pause_turn` resume loop in that file is hand-written rather
+than delegated to the SDK's tool runner.
+
+**Why:** Four separate choices, worth recording individually because three of them look like
+defaults and the fourth looks like a mistake:
+
+- **SDK over raw HTTP.** No hand-built requests against `api.anthropic.com` anywhere — the SDK
+  handles auth resolution, retries on 429/5xx, and typed errors we'd otherwise reimplement. The
+  zero-arg `new Anthropic()` constructor also resolves credentials from the environment, which is
+  what made entry 37's key-setup back-and-forth end in a zero-code-change outcome.
+- **Server-side only.** The key is loaded via `dotenv` in `server/index.js` and never reaches the
+  browser; the React client talks only to our own Express routes. Correct regardless of the
+  single-user/self-hosted scope locked above, and not something to relax if that scope changes.
+- **Non-beta surface.** Everything currently used — `web_search_20260209`, `output_config.format`,
+  adaptive thinking — is GA, so there's no reason to take a beta dependency. This is a live
+  constraint, not a preference: adding the server-side `fallbacks` parameter to improve the
+  `refusal` path would require moving to `client.beta.messages` plus a beta flag.
+- **Hand-rolled `pause_turn` loop, deliberately.** The obvious objection is "why not use the SDK's
+  tool runner?" — and the answer is that it would not help. The tool runner exists to execute
+  *your* client-side tool functions in a loop; our only tool is the server-side `web_search`, which
+  Anthropic executes, so there is nothing for the runner to run. It also does not auto-resume
+  `pause_turn`: a paused turn ends the runner and is returned as the final message with no error,
+  so we would still be writing our own pause handling, just with a beta dependency added on top.
+
+**How to apply:** Keep `agent.js` as the single Claude call site — new agent capabilities belong
+there rather than in a second client elsewhere in the server. Do not "modernize" the resume loop
+into the tool runner; the loop's known defects (see the four deferred items — dropped history and
+no iteration cap) are ours to fix in place, and an SDK upgrade will not resolve them. Revisiting
+the non-beta choice is triggered by needing a specific beta feature, `fallbacks` being the likely
+first one — not by the tool runner.
