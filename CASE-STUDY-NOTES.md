@@ -1170,3 +1170,196 @@ four failures destroyed a full survey and required manual re-entry. It also mean
 can't be evaluated against the answers that produced it — which surfaced immediately when the user
 noticed the plan compressed the CCAR-F foundations track into a single phase and there was no
 recorded input to check that judgment against.
+
+## 41. A debugging session turned into design capture, and the assistant had to retract two of its own confidently-repeated claims — both catchable from files it had not read
+
+**When:** 2026-08-03, continuing from entries 39-40.
+
+**What happened:** After the plan-generation fix landed, the session moved from debugging to design
+capture: an architecture decision on multi-credential paths, a new `BACKLOG.md`, and a tiered
+split between v1 and later work. Two things the assistant had asserted repeatedly during the
+debugging phase turned out to be wrong, and both were disproved by files sitting in the repo the
+whole time.
+
+*Claim 1 — "the interview answers aren't persisted" flagged as a gap.* Raised three times across
+the session as something worth fixing, each time framed as an oversight. When the assistant finally
+opened `ARCHITECTURE-DECISIONS.md` to write the backlog, the "Single-user, self-hosted scope
+decision" entry turned out to lock exactly the opposite, and to have been *tightened* during design
+rather than left loose: transcript handling moved from "drop from the live store" to **"never
+persisted at all"**, with offline logging, local retention, and datamining use "fully retired, not
+just softened." `INTERVIEW-DECISIONS.md:345` depends on it too. It was a deliberate privacy
+position, not an oversight.
+
+*Claim 2 — "each failure destroyed a full survey and required manual re-entry."* Asserted three
+times as the operational justification for persisting answers, and written into a backlog item
+before being checked. `client/src/pages/Interview.jsx:126` shows the `submit` handler's `catch`
+calling only `setError`; the `answers` state is never cleared. A failed generation leaves the
+filled survey intact — which is exactly why the user was able to resubmit four times without
+complaint. No re-entry was ever involved.
+
+Both were caught by the assistant rather than the user, but only after several turns of building on
+them. Removing claim 2 gutted most of the case for the backlog item it had justified; what survived
+was a different and narrower argument — that with no record of the answers, a generated plan can't
+be evaluated against the inputs that produced it, which is a debugging gap rather than a UX one.
+
+**Why notable:** This repo exists partly to prevent exactly this. `CLAUDE.md` opens by orienting
+every session to the decision docs, and lists them by name with one-line summaries. The assistant
+still spent multiple turns reasoning from `agent.js` and `routes/interview.js` alone, treating
+absence-in-code as absence-of-decision. The failure mode is specific and worth naming for anyone
+building this way: **an agent reading source will pattern-match "missing capability" to "oversight,"
+because code records what was built and not what was deliberately declined.** A decision to *not*
+do something leaves no trace in the implementation — only in the decision log. Claim 2 is the
+sharper of the two, because it was cheaper to check than claim 1 and got asserted more confidently:
+a single grep of the client would have settled it before any of the three assertions.
+
+Both corrections were made in place, in the docs as well as the conversation, rather than only
+verbally — the multi-credential entry in `ARCHITECTURE-DECISIONS.md` and the backlog item both
+carry the corrected version, with the wrong justification explicitly marked as withdrawn so a later
+reader doesn't reconstruct it.
+
+**Secondary — doc scoping, decided rather than defaulted.** The tiered list needed somewhere to
+live, and `CLAUDE.md`'s standing rule is that product/design rationale belongs in the decision docs
+and only meta-level collaboration material belongs in the case-study file. Neither fit a running
+list of outstanding work, so `BACKLOG.md` was created with an explicit division stated at the top:
+the backlog tracks *what is outstanding* and links out; the decision docs hold *why*. Cross-
+references were then verified to resolve — one dangling pointer to a section the restructure had
+dissolved ("Interview answer persistence") was caught and repointed before committing.
+
+**Also notable — the user tiered the work, then corrected the tiering three times.** The assistant
+proposed a line ("v1 = make what exists correct; v2 = new capability; v3+ = scope expansion") and
+the user reshaped it across four turns: v2 became the closed beta specifically, multi-credential
+moved into v2 as something to cover during that development phase, v3 was scoped as an open
+question rather than "v2 plus billing," and finally a v1.5 tier was inserted so grounding-file
+download could ship ahead of any hosting. The assistant had placed multi-credential in v1 by
+inference and flagged the placement as assumed rather than instructed, which is what made the
+correction cheap.
+
+## 42. Privacy and ethics: an analysis aimed at the wrong threat model, a mechanism that beat the policy, and an ethical choice with a written price tag
+
+**When:** 2026-08-03, same session as entry 41. Recorded separately because the privacy/ethics
+thread is a topic in its own right rather than an incident.
+
+**Context:** The user named a future closed beta that would collect interview answers and generated
+plans to expand the grounding corpus. That reverses a locked decision (see entry 41), so the
+session worked through what the reversal required.
+
+### The assistant analysed before establishing the threat model
+
+Told only "collect answers and plans for grounding refinement," the assistant produced a detailed
+privacy analysis: field-by-field sensitivity of the interview instrument, re-identification risk
+from role + years + domain + target cert, the observation that `agentNotes` embeds the person's
+background so "collect only the plans" is not a safe subset, and a deletion-authentication fork
+arising from one-time codes being an access gate rather than an identity.
+
+The user then supplied the actual shape: a **closed** beta among professional colleagues, likely
+under 50 people, with the project remaining open source so anyone can decline and self-host the
+*full* product with their own API key, and with the ~$1-per-run cost stated openly to participants.
+
+Three of the concerns dissolved immediately, and for the same reason — they had been aimed at an
+anonymous public deployment that was never the plan:
+
+- **Re-identification** — moot. Participants are known colleagues, already identified to the
+  operator. Anonymisation was never the control; pursuing it would have been theatre.
+- **Deletion authentication** — moot. Identity exists socially; a colleague asks, the operator
+  deletes.
+- **Consent quality** — satisfied better than usual. Refusal is costless because the alternative
+  is the complete product, not a degraded tier.
+
+**Why notable:** the analysis was not wrong so much as *aimed*, and nothing in it announced its own
+aim. It read as rigorous general-purpose privacy work while being calibrated to a deployment shape
+the assistant had invented by default. For privacy and ethics work specifically, the threat model
+does more to determine the answer than the analysis does — and an agent defaulting to worst-case
+framing produces something that looks thorough and points the wrong way. The cheap fix is
+ordering: establish who the users are, what the alternative to participating is, and who holds the
+data, *before* analysing. That is one question, and it would have replaced most of the output.
+
+### What survived, and why it survived
+
+One concern was untouched by the reframe: **third-party confidentiality.** Two free-text fields
+invite participants to describe their *employer's* internal AI usage — Group A's "anything else
+about how Claude fits into your work today" and Group C's "what's driving it." A participant's
+consent does not extend to their employer's information.
+
+The structural reason it survived is worth isolating: every dissolving factor — closed membership,
+transparency, a genuine exit option, social trust — operates on the *consenting party*.
+Consent-based reasoning has a systematic blind spot for parties who are not in the room. Any
+privacy posture built primarily on consent quality will be strong exactly where consent applies and
+silent where it doesn't.
+
+The reframe that made it actionable was also not the privacy framing: employer-confidential
+material in a grounding corpus is a **stored liability and unusable data** — it can't be quoted in
+the intended open-source case study. Mitigation is one line of copy, not a mechanism.
+
+### The user's mechanism beat the assistant's policy
+
+The assistant had proposed policy instruments: opt-in consent, disclosure copy, a separate opt-in
+for the high-risk free-text fields, retention windows.
+
+The user proposed a mechanism instead — **let users download the exact grounding file produced from
+their session**, with self-hosted users free to share theirs if they want.
+
+This is strictly stronger, and the reason generalises. Policy is a *claim about* what the system
+does, and claims drift from implementations silently. The downloadable artifact converts
+consent-by-disclosure into consent-by-inspection: there is no gap for drift to open in, provided
+what is downloaded is byte-for-byte what is retained — an invariant now written into `BACKLOG.md`
+precisely because it erodes quietly. It also answered, by construction, one of the two open
+questions the assistant had said prose would have to settle ("what is retained"), leaving only the
+retention window.
+
+Two second-order effects fell out that neither party had set out to get: it **decouples
+contributing from hosting** (a self-hoster who never touches the beta can still send a grounding
+file, so the corpus can grow from people who declined the hosted option), and it **forces the
+grounding format to be legible** to a non-expert, which pushes it toward the persona-shaped
+abstraction the grounding work already uses. That last one made privacy and usability pull in the
+same direction rather than trading off — which is unusual enough to note.
+
+The user later extended it into its own release tier (v1.5) specifically so the mechanism ships
+*before* the beta's consent posture depends on it.
+
+### An ethical choice with a price tag, and a guard against optimising it away
+
+The user chose to have hosted users opt in **after** seeing the generated grounding file, accepting
+that the operator pays the full ~$1 per run regardless of whether the user then shares — including
+for runs that yield nothing. Stated directly: *"The sample size is controlled directly by me and
+I'll risk the cost in the name of ethics and privacy."*
+
+What makes this worth recording is not the choice but its durability. The obvious future efficiency
+move — ask for consent up front, before spending the money — is precisely what the decision
+rejects, because consenting before the artifact exists is consenting to a description rather than
+the thing itself. Under cost pressure at a later tier, that optimisation would read as an obvious
+win to anyone who wasn't in this conversation. So `BACKLOG.md` carries an explicit *do not optimise
+this later* note, with the reasoning attached and the redirect stated (cost pressure is a reason to
+revisit pricing or volume, not to move the consent gate earlier). **An ethical decision with a
+legible price tag needs its rationale stored next to the price, or the price wins by default.**
+
+### Two tensions recorded rather than resolved
+
+*Privacy pressure and research purpose pull opposite ways.* Grounding artifacts are already
+abstractions — "consulting engineer, ~8 years, design-not-build role" is a dimensional profile
+nobody said aloud — so storing summaries instead of transcripts is both more private and the
+corpus's native format. But a summariser mapping answers onto the existing schema can only capture
+dimensions already thought of, and the entire reason real data beats 23 synthetic personas is
+finding axes nobody anticipated. Abstract everything and the result confirms the current persona
+space instead of expanding it. Resolved asymmetrically — verbatim where unanticipated dimensions
+arrive (`goals`, diagnostic source), abstracted where they don't — rather than uniformly.
+
+*The ethical mechanism may bias the research.* Opt-in-after-inspection means the corpus is
+filtered by willingness to share, and people who share may differ systematically from those who
+don't — less confidential work, more comfort with disclosure. Since the corpus's purpose is
+precisely to find what the synthetic personas missed, a quietly filtered sample yields confirmation
+dressed as expansion. Raised by the assistant rather than the user, and handled by recording that
+the decline rate should be tracked as a bias indicator — a plain count, requiring nothing sensitive
+to be retained. Notable as a case where the ethics choice and the research goal are in mild tension
+rather than aligned, which is easy to miss when both feel like the same virtue.
+
+### The dissolved concerns are dissolved by *shape*, not by any mechanism
+
+Recorded explicitly in `BACKLOG.md` because it would otherwise be lost: the three concerns that
+evaporated did so because of the beta's specific shape — small, closed, known colleagues, a real
+free alternative. No mechanism solved them. So **all three return** at a paid, openly-reachable
+version, and were written into v3 as returning rather than settled. The user made the same point
+independently from the cost side: a public app "could easily be abused by malicious actors and
+bankrupt me, so the models will need to differ wildly." That surfaced something neither party had
+stated — the one-time-code gate was doing double duty in the beta, as access control *and* as a
+hard spend cap by arithmetic (50 codes bounds exposure at ~$50 regardless of intent), and that
+second property vanishes silently the moment signup opens.
