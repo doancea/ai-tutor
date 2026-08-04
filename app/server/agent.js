@@ -18,6 +18,13 @@ const MODEL = 'claude-opus-5';
 // by the size guidance in buildSystemPrompt, not by this number.
 const MAX_TOKENS = 32000;
 
+// Cap on `pause_turn` resume rounds. Never observed firing — the first
+// successful run did zero pause_turn rounds — but an unbounded resume loop
+// against a metered API is unbounded spend, and the failure mode is silent.
+// 5 is generous relative to anything seen in practice; a run that needs more
+// than that is a bug, not a long search.
+const MAX_CONTINUATIONS = 5;
+
 // Content-only — no ids. The server assigns those after parsing (see
 // shapeIntoStore below), which is more robust than trusting the model for
 // uniqueness/format and keeps this schema simple enough for structured
@@ -107,6 +114,19 @@ function buildSystemPrompt() {
       'agentNotes rather than trying to force free-form guidance into a field that won\'t render ' +
       'it, and lean the task wording toward direction-and-pointers rather than rigid step-by-step ' +
       'where their answer suggests that fits better.',
+    '',
+    // Disclosure, not a fix. ARCHITECTURE-DECISIONS ("Multi-credential / staged
+    // certification paths") rules out solving staged paths by prompt-tuning —
+    // the data model needs a credential concept, which is v2 work. This says
+    // the same thing the "Output shape" instruction above does: when the app's
+    // shape can't hold what was asked for, tell the person rather than let them
+    // notice. The compression itself is unchanged.
+    'Staged certification paths: if they named more than one credential (e.g. a foundations track ' +
+      'and a professional one), the plan can only carry a single target certification and one flat ' +
+      'phase list, so an earlier credential has to be compressed into a milestone phase rather than ' +
+      'given proportional coverage. Do that, and say so plainly in agentNotes — name which credential ' +
+      'was compressed and that its coverage is lighter than a dedicated plan would be. Do not encode ' +
+      'the staging into the targetCertification string as a substitute for saying it.',
     '',
     'Keep phase, task, and quiz content specific to the actual named or inferred certification, ' +
       'not generic Claude platform trivia, unless the track\'s real domain content is genuinely ' +
@@ -276,20 +296,28 @@ async function generatePlan(answers) {
     }
   };
 
-  let messages = [{ role: 'user', content: userText }];
+  const messages = [{ role: 'user', content: userText }];
   let response = await send(messages);
   logResponseEnvelope('initial', response);
 
-  // Server-tool turns can hit the internal iteration cap and pause; resume
-  // by resending [user, assistant] with no new user turn, per the documented
+  // Server-tool turns can hit the internal iteration cap and pause; resume by
+  // resending the accumulated history with no new user turn, per the documented
   // server-tool resume pattern.
-  while (response.stop_reason === 'pause_turn') {
-    messages = [
-      { role: 'user', content: userText },
-      { role: 'assistant', content: response.content },
-    ];
+  //
+  // Appending rather than rebuilding as [user, latestAssistant] matters from the
+  // *second* pause onward: rebuilding drops the earlier round's server_tool_use
+  // and search-result blocks, so the model loses its own prior search results
+  // mid-flight and re-searches from scratch.
+  for (let continuation = 1; response.stop_reason === 'pause_turn'; continuation++) {
+    if (continuation > MAX_CONTINUATIONS) {
+      throw new Error(
+        `Plan generation paused for server tool use more than ${MAX_CONTINUATIONS} times without finishing. ` +
+          'Stopped to avoid an unbounded retry loop — try again, or raise MAX_CONTINUATIONS in server/agent.js.'
+      );
+    }
+    messages.push({ role: 'assistant', content: response.content });
     response = await send(messages);
-    logResponseEnvelope('after pause_turn resume', response);
+    logResponseEnvelope(`after pause_turn resume ${continuation}`, response);
   }
 
   if (response.stop_reason === 'refusal') {
@@ -308,7 +336,13 @@ async function generatePlan(answers) {
     );
   }
 
-  const textBlock = response.content.find((block) => block.type === 'text');
+  // findLast, not find: with web_search in the tool set a turn can interleave
+  // commentary text before the final structured answer, and the *first* text
+  // block would then be prose rather than the JSON. More likely to bite at
+  // MAX_TOKENS 32000 than it was at 8000, since there is more room for
+  // commentary. The one successful run had exactly one text block, in final
+  // position, so both selectors agreed there.
+  const textBlock = response.content.findLast((block) => block.type === 'text');
   if (!textBlock) {
     throw new Error('Plan generation did not return structured output.');
   }
