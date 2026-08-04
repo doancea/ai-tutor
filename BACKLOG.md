@@ -22,33 +22,49 @@ file tracks what is outstanding and links out.
 
 # v1 — correctness within locked scope
 
-## Open defects — `app/server/agent.js`
+**Closed 2026-08-03.** All three items are done; kept below as a record of what changed and why,
+since the two defects were latent rather than observed and the evidence for them is worth keeping.
+
+## Closed defects — `app/server/agent.js`
 
 Found 2026-08-03 during a review of the Claude API integration and deliberately deferred at the
-time. Two of the original four were closed by commit `89d8ea6`; these two remain. Neither has fired
-in production yet.
+time. Two of the original four were closed by commit `89d8ea6`; these two closed with the v1 pass.
+**Neither ever fired in production**, which shaped how they were verified — see the note below.
 
-### `pause_turn` resume loop drops history, and is unbounded
+### `pause_turn` resume loop dropped history, and was unbounded — fixed
 
-`generatePlan`'s `while (response.stop_reason === 'pause_turn')` loop rebuilds `messages` as
+`generatePlan`'s `while (response.stop_reason === 'pause_turn')` loop rebuilt `messages` as
 `[user, latestAssistant]` instead of appending, so on a second or later pause the earlier round's
-`server_tool_use` / search-result blocks are dropped and the model loses its own prior search
-results mid-flight. The loop also has no iteration cap.
+`server_tool_use` / search-result blocks were dropped and the model lost its own prior search
+results mid-flight. The loop also had no iteration cap.
 
-**Fix:** append to a growing `messages` array; bound the loop with a `max_continuations`.
-**Status:** never observed firing — the first successful run did zero `pause_turn` rounds.
-**Priority note:** highest of the v1 defects despite never firing. An unbounded resume loop against
-a metered API is unbounded spend, and the failure mode is silent.
+**Fixed by:** appending each paused assistant turn to a growing `messages` array, and bounding the
+loop with `MAX_CONTINUATIONS = 5` (throws a plain-language error past that).
+**Was:** the highest-priority v1 defect despite never firing — an unbounded resume loop against a
+metered API is unbounded spend, and the failure mode is silent.
 
-### First-text-block extraction is fragile
+### First-text-block extraction was fragile — fixed
 
-`response.content.find(block => block.type === 'text')` takes the *first* text block. With
+`response.content.find(block => block.type === 'text')` took the *first* text block. With
 `web_search` in the tool set, a turn can contain interleaved commentary text before the final
-structured answer, in which case `JSON.parse` runs on prose.
+structured answer, in which case `JSON.parse` would run on prose.
 
-**Fix:** `.findLast()`.
-**Status:** latent. The one successful run had exactly one text block, in final position. Slightly
-more likely to bite now that `MAX_TOKENS` is 32000, since there is more room for commentary.
+**Fixed by:** `.findLast()`.
+**Was:** latent. The one successful run had exactly one text block, in final position, so both
+selectors agreed there.
+
+### How these were verified, since neither had ever fired
+
+Both defects were in a code path no real run had exercised, so "it still works" against a live run
+would have proved nothing — a live run does zero `pause_turn` rounds and returns one text block, so
+it exercises neither fix. They were instead verified against a stubbed `@anthropic-ai/sdk`
+(injected into `require.cache` before `agent.js` loads, since it constructs its client at module
+load), scripting the responses the real API would have to return: two consecutive `pause_turn`
+rounds, then an endless run of them, then a turn with commentary text before the JSON. That
+confirmed history accumulates across rounds, the loop stops after 1 initial + 5 resumes, and
+`findLast` selects the JSON where `find` would have selected prose. The harness was a throwaway,
+not a checked-in test — there is no test suite in this repo yet, and adding one was outside the
+v1 line.
 
 ### Related, not a defect: undeclared response block types
 
@@ -57,13 +73,23 @@ The successful run returned four `code_execution_tool_result` blocks despite `to
 server-side code. Unverified. No action needed: the current code selects by type and ignores the
 rest. Recorded so anything future that iterates `response.content` tolerates undeclared types.
 
-## Honest handling of staged certification requests
+## Honest handling of staged certification requests — done
 
 Cheap mitigation for the multi-credential limitation below, pending the real fix. When the interview
-names a staged path (e.g. Foundations *and* Professional), the plan currently compresses the earlier
-credential into a single milestone phase without saying so. `buildSystemPrompt` already has a
-"note the mismatch in `agentNotes`" pattern for plan-format requests it can't satisfy; apply the
-same move here so the user is told rather than left to notice.
+names a staged path (e.g. Foundations *and* Professional), the plan compressed the earlier
+credential into a single milestone phase without saying so.
+
+**Fixed by:** a "Staged certification paths" instruction in `buildSystemPrompt`, following the same
+move the existing "Output shape" instruction makes for plan-format requests the data model can't
+satisfy — compress as before, but name the compressed credential in `agentNotes` and say its
+coverage is lighter than a dedicated plan would be. It also explicitly tells the model *not* to
+encode the staging into the `targetCertification` string, which is what the first real run did and
+what surfaced the gap in the first place.
+
+**This is disclosure, not a fix**, and deliberately so: `ARCHITECTURE-DECISIONS.md` rules out
+addressing staged paths by prompt-tuning, because that fights the data model instead of fixing it.
+The compression behaviour is unchanged; only the silence about it is. The structural fix stays in
+v2.
 
 ---
 

@@ -1363,3 +1363,70 @@ bankrupt me, so the models will need to differ wildly." That surfaced something 
 stated — the one-time-code gate was doing double duty in the beta, as access control *and* as a
 hard spend cap by arithmetic (50 codes bounds exposure at ~$50 regardless of intent), and that
 second property vanishes silently the moment signup opens.
+
+---
+
+## 43. Closing v1: verifying two fixes for bugs that had never happened, and one "fix" that was deliberately only a disclosure
+
+**When:** 2026-08-03, immediately after `BACKLOG.md` was written (commit `f19343d`). User opened the
+session with three words: "lets knock out v1".
+
+**What happened.** The whole instruction was "lets knock out v1" — no list, no files named. That was
+sufficient only because `BACKLOG.md` had been written a few commits earlier and defines v1 as a
+named tier with an explicit scope line ("make what already exists correct... nothing in v1
+introduces a concept the system doesn't have or touches a locked decision"). The backlog turned a
+three-word prompt into a well-specified task. Worth noting as the payoff for writing the tiering
+doc, which at the time looked like pure overhead.
+
+Three items, all in `app/server/agent.js`: the `pause_turn` resume loop dropping history and running
+unbounded; first-text-block extraction using `.find()` where `.findLast()` was needed; and honest
+disclosure when a staged certification path gets compressed.
+
+**The interesting part — how do you verify a fix for a bug that has never fired?** Both defects were
+explicitly recorded as latent: the one successful production run did zero `pause_turn` rounds and
+returned exactly one text block, in final position. So a live run proves nothing about either fix —
+it doesn't reach the changed code at all. "It still works" would have been an entirely empty check,
+and a tempting one, because the app does still work.
+
+What was done instead: stub `@anthropic-ai/sdk` by injecting it into `require.cache` before
+`agent.js` loads (necessary because `agent.js` constructs its client at module load), then script
+the responses the real API would have to return in order to trigger each bug — two consecutive
+`pause_turn` rounds, then an endless run of them, then a turn with commentary text before the JSON.
+Four assertions, all passing: history accumulates across rounds rather than being rebuilt, the loop
+stops after 1 initial + 5 resumes, `findLast` selects the JSON where `find` would have selected
+prose, and a response with no text block still fails with the intended message.
+
+The harness was thrown away rather than checked in — this repo has no test suite, and adding one
+would have crossed the v1 line ("nothing in v1 introduces a concept the system doesn't have"). That
+is a genuinely arguable call: the throwaway proves the fix today and protects nothing tomorrow. It
+is recorded here rather than silently made, and the *approach* is preserved in `BACKLOG.md` so a
+future reader knows what was verified and how.
+
+**The third item is a "fix" that deliberately fixes nothing.** `ARCHITECTURE-DECISIONS.md` contains
+an explicit instruction: "Do not address staged paths by adding instructions to
+`buildSystemPrompt`" — prompt-tuning fights the data model instead of fixing it. And yet the v1
+item was precisely an instruction added to `buildSystemPrompt`. These only look contradictory: the
+locked decision forbids using the prompt to *solve* staged paths, while the v1 item uses the prompt
+to *disclose* that they aren't solved. The compression behaviour is unchanged; only the silence
+about it is. The structural fix stays in v2.
+
+This is a distinction worth having a name for, because the two are one keystroke apart in the same
+function and the temptation to slide from disclosure into a partial fix is real. The added
+instruction also tells the model *not* to encode the staging into the `targetCertification`
+string — closing the loop on entry 39's diagnostic, where the model doing exactly that is what
+revealed the schema was missing a concept in the first place.
+
+**Also.** The `claude-api` skill's own guidance turned out to already contain the fix for the
+`pause_turn` defect, phrased as a general caution ("Set a `max_continuations` limit (e.g., 5) to
+prevent infinite loops") — the bug was writing the resume loop from memory rather than from the
+documented pattern. Worth noting for anyone reasoning about where agent-written bugs come from: this
+one wasn't a reasoning failure, it was a not-looking-it-up failure, and the reference material that
+would have prevented it was one tool call away the whole time.
+
+**Housekeeping the close forced.** The persistent-memory file recording these as "deferred, don't
+fix opportunistically" became actively misleading the moment they were fixed — it would have told a
+future session not to touch work that was already done. Rewritten in place: the guidance flipped
+from "don't fix" to "don't re-raise", and what survives is the part that was never about the
+defects at all (the measured per-run token and cost baseline, and the caution about undeclared
+response block types). A small instance of the maintenance overhead that persistent memory carries:
+every closed item is a memory that has to be actively corrected, not just left to age.
