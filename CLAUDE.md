@@ -14,7 +14,7 @@ this file is the standing orientation for the second one, since it applies acros
   self-hosted).
 - `PROCESS-DECISIONS.md` — meta-analysis of *how* the interview decisions were made (the why/how
   process tests) — about interview-design methodology specifically, not the collaboration itself.
-- `TEST-PERSONAS.md` / `PERSONA-DECISIONS.md` — 22 synthetic grounding personas and the rationale
+- `TEST-PERSONAS.md` / `PERSONA-DECISIONS.md` — 23 synthetic grounding personas and the rationale
   behind them.
 - `GROUNDING-DECISIONS.md` — mechanics of running the persona grounding exercise (persona/
   interviewer subagent split, adaptive repeat-testing loop, grounding file layout, Step 3 synthesis
