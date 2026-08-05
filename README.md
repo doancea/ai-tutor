@@ -110,6 +110,7 @@ ai-tutor/
 
 ## License
 
-**No license file yet.** Until one is added, default copyright applies and no permissions are
-granted — so treat this as source-available for reading rather than as open source, whatever the
-intent. A license needs choosing before that changes.
+[MIT](LICENSE). Use it, fork it, build on it.
+
+Note that the design record — the decision documents, grounding records, and case-study notes — is
+covered by the same license as the code. It's meant to be read, quoted, and argued with.
