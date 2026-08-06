@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "description": "Local, single-user, multi-certification study plan generator and tracker.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "postinstall": "cd client && npm install",
     "dev": "concurrently -n SERVER,CLIENT -c blue,yellow \"npm:dev:server\" \"npm:dev:client\"",
