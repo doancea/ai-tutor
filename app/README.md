@@ -122,7 +122,9 @@ You only need `npm run build` after you change the app's code — day to day, `n
 enough. This is the mode you'll use while actually studying.
 
 To stop it, press **Ctrl+C** in the terminal where it's running. If you closed that terminal and the
-app is somehow still up, `npm stop` will clear it.
+app is somehow still up, `npm stop` will clear it — though that one relies on `lsof`, so it's
+macOS and Linux only. On Windows, close the terminal window, or use Task Manager to end the Node
+process.
 
 **Development mode** — only if you want to edit the app's React components and see changes instantly:
 

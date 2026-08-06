@@ -6,7 +6,7 @@ product/design decisions (those live in `DECISIONS.md`, `INTERVIEW-DECISIONS.md`
 `ARCHITECTURE-DECISIONS.md`, `PROCESS-DECISIONS.md`, `PERSONA-DECISIONS.md`,
 `GROUNDING-DECISIONS.md`, `TEST-PERSONAS.md`, `INTERVIEW-SCRIPT.md`). This is a log for later
 synthesis into a public case study — not itself a polished narrative. Each entry cites the
-source transcript (`/Users/danieloancea/.claude/projects/-Users-danieloancea-code-ai-tutor/4b99df4f-1920-475b-93c4-66ce4a6bdd09.jsonl`)
+source transcript (`~/.claude/projects/<project-slug>/4b99df4f-1920-475b-93c4-66ce4a6bdd09.jsonl`)
 by its JSONL line number and approximate timestamp so it can be re-verified later. Ordered
 chronologically.
 
@@ -1430,3 +1430,51 @@ from "don't fix" to "don't re-raise", and what survives is the part that was nev
 defects at all (the measured per-run token and cost baseline, and the caution about undeclared
 response block types). A small instance of the maintenance overhead that persistent memory carries:
 every closed item is a memory that has to be actively corrected, not just left to age.
+
+---
+
+## 44. Release housekeeping, where most of the value was in what *didn't* get changed
+
+**When:** 2026-08-04 / 2026-08-05, immediately after the v1 defect pass (entry 43). User asked for a
+README pass "useful to an unfamiliar user... entry-level engineering experience", then a repo README,
+a licence, and a v1.0.0 tag.
+
+**Documenting by verification rather than by reading the code.** The README claims things a beginner
+will act on, so each was checked rather than inferred. Three came back with something to say. The
+failed-generation path does retain your answers on screen (`Interview.jsx` sets only `error`), so the
+README promises it. `SEED_DEMO=true` really does seed a full plan with `ANTHROPIC_API_KEY` unset —
+but `db.defaults()` only fills in *missing* keys, so the setting is silently ignored once a plan
+exists. Read from the code alone, "set `SEED_DEMO=true` and restart" looks like it might overwrite
+your progress; that caveat went into the README because the test surfaced it. Verifying it meant
+temporarily moving the user's real `learning-plan.json`, which was backed up and checksum-verified on
+restore — worth noting that "test the documented path" and "don't destroy the user's data" needed
+reconciling rather than one winning.
+
+**The tag shipped without the thing it was supposed to advertise.** `v1.0.0` was tagged, pushed, and
+only then did the root README get written — so the tagged tarball had no front door, which was the
+exact problem the root README existed to solve. Caught by asking what someone downloading the tag
+would actually see, rather than by any tooling. Fixed by moving the tag, which is only cheap because
+the tag was minutes old with no consumers; the same mistake a week later is one you live with.
+
+**The interesting part: a count that was wrong in one place and right in three others.** `CLAUDE.md`
+said "22 synthetic grounding personas"; `TEST-PERSONAS.md` has 23. The obvious move is to update
+every "22" in the repo. That would have been wrong. `GROUNDING-FINDINGS.md` ("all 22 personas
+resolved"), `GROUNDING-DECISIONS.md`, and `CASE-STUDY-NOTES.md` describe the grounding exercise *as
+it actually ran*, before persona #23 existed — and `GROUNDING-FINDINGS.md` itself records that a
+23rd was added after that synthesis pass, in response to its own Finding 9. Those are accurate
+history. Only `CLAUDE.md` was wrong, because it was the sole present-tense claim about what
+`TEST-PERSONAS.md` currently contains.
+
+The distinction is worth stating because a global find-and-replace looks like diligence and is
+actually damage: it would have overwritten a true record of a smaller exercise with a tidier number,
+and erased the evidence that the persona set grew in response to a finding. The reasoning went into
+the commit message so the same "fix" isn't reapplied later by someone counting files. Tense is the
+tell — a doc describing what a file *contains* ages; a doc describing what *happened* does not.
+
+**A limit worth recording about anonymisation.** The user asked to swap their real name out of the
+`LICENSE` for an invented one. Done, along with an absolute path in this file that leaked the OS
+username. But this is cosmetic: every commit in the repo carries the real name and email in its
+author metadata, and the GitHub remote carries the real handle. Substituting the visible string
+without saying so would have implied a privacy property the repo does not have. Flagged rather than
+quietly delivered — the fix (rewriting author history, moving the remote) is available but was not
+what was asked for.
